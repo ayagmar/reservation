@@ -12,10 +12,9 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "reservation")
 @RequiredArgsConstructor
+
+@Table(name = "reservation")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,17 +28,8 @@ public class Booking {
     @OneToOne(cascade = CascadeType.ALL)
     private User userReserv;
 
-
-
-
-
-
-
-
-
-
-
-
+    @OneToOne(cascade = CascadeType.ALL)
+    private Room roomReserv;
 
 
     @Override

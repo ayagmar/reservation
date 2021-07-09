@@ -11,8 +11,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class Role implements Serializable {
     @Id
     @Column(name="role_id")

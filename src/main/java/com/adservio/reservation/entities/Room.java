@@ -14,8 +14,6 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
-@NoArgsConstructor
 @RequiredArgsConstructor
 public class Room implements Serializable {
     @Id
@@ -30,11 +28,8 @@ public class Room implements Serializable {
 
 
     @OneToMany(cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Booking> reservation = new ArrayList<>();
-
-
-
-
 
 
     @Override

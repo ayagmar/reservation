@@ -5,15 +5,15 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
-@NoArgsConstructor
 @RequiredArgsConstructor
 public class User implements Serializable {
     @Id
@@ -33,6 +33,9 @@ public class User implements Serializable {
 
 
 
+@OneToMany(cascade = CascadeType.ALL)
+@ToString.Exclude
+private Set<Booking> reservations=new HashSet<>();
 
 
 
@@ -47,10 +50,6 @@ public class User implements Serializable {
     private Set<Role> roles = new HashSet<>();
 
 
-
-
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,6 +61,6 @@ public class User implements Serializable {
 
     @Override
     public int hashCode() {
-        return 741337932;
+        return 562048007;
     }
 }
