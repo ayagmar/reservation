@@ -4,17 +4,17 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.awt.print.Book;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
     @Id
     @Column(name="user_id")
@@ -28,16 +28,14 @@ public class User implements Serializable {
     private String email;
     @Column(nullable = false,length = 40)
     private String Password;
-    int ReservationCount=0;
     boolean reserving=false;
 
 
-
+/*
 @OneToMany(cascade = CascadeType.ALL)
 @ToString.Exclude
-private Set<Booking> reservations=new HashSet<>();
-
-
+private List<Booking> reservations=new ArrayList<>();
+*/
 
 
 
@@ -47,7 +45,7 @@ private Set<Booking> reservations=new HashSet<>();
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private List<Role> roles = new ArrayList<>();
 
 
     @Override

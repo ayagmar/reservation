@@ -4,7 +4,9 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -26,10 +28,8 @@ public class Booking {
     private String description;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private User userReserv;
+    private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Room roomReserv;
 
 
     @Override

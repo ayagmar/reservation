@@ -14,11 +14,13 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+
 public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="room_id")
+    @Column(name = "room_id")
     private Long id;
     private String number;
     private Integer capacity;
@@ -26,10 +28,10 @@ public class Room implements Serializable {
     @Enumerated(EnumType.STRING)
     private RoomStatus roomstate;
 
-
     @OneToMany(cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<Booking> reservation = new ArrayList<>();
+    private List<Booking> Reservation = new ArrayList<>();
+
+
 
 
     @Override
