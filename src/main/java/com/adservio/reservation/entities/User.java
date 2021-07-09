@@ -48,6 +48,9 @@ private List<Booking> reservations=new ArrayList<>();
     private List<Role> roles = new ArrayList<>();
 
 
+
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
