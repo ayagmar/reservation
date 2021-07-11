@@ -20,15 +20,21 @@ import java.util.Objects;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="reservation_id")
+    @Column(name="id")
     private Long id;
     Date StartDate;
     Date EndDate;
     private Long duration;
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private User user;
+
+    @ManyToOne
+    private Room room;
+
+
+
 
 
 

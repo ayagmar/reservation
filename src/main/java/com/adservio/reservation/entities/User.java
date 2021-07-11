@@ -17,7 +17,6 @@ import java.util.*;
 @AllArgsConstructor
 public class User implements Serializable {
     @Id
-    @Column(name="user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false,length = 40)
@@ -28,7 +27,6 @@ public class User implements Serializable {
     private String email;
     @Column(nullable = false,length = 40)
     private String Password;
-    boolean reserving=false;
 
 
 /*
@@ -36,6 +34,9 @@ public class User implements Serializable {
 @ToString.Exclude
 private List<Booking> reservations=new ArrayList<>();
 */
+@OneToMany(mappedBy = "user")
+@ToString.Exclude
+private Collection<Booking> reservation;
 
 
 

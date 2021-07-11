@@ -20,7 +20,6 @@ import java.util.Objects;
 public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id")
     private Long id;
     private String number;
     private Integer capacity;
@@ -28,7 +27,8 @@ public class Room implements Serializable {
     @Enumerated(EnumType.STRING)
     private RoomStatus roomstate;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "room")
+    @ToString.Exclude
     private List<Booking> Reservation = new ArrayList<>();
 
 
