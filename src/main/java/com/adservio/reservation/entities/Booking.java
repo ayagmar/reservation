@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 
 @Table(name = "reservation")
-public class Booking {
+public class Booking implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
@@ -26,6 +27,7 @@ public class Booking {
     Date EndDate;
     private Long duration;
     private String description;
+    private String reservationCode;
 
     @ManyToOne
     private User user;

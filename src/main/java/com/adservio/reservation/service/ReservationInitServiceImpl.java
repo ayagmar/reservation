@@ -1,7 +1,7 @@
 package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.BookingRepository;
-import com.adservio.reservation.dao.RoleRepository;
+//import com.adservio.reservation.dao.RoleRepository;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.entities.Booking;
@@ -11,12 +11,12 @@ import com.adservio.reservation.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
+
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
 
 @Service
 @Transactional
@@ -25,8 +25,7 @@ public class ReservationInitServiceImpl implements IReservationInitService{
     private BookingRepository bookingRepository;
     @Autowired
     private RoomRepository roomRepository;
-    @Autowired
-    private RoleRepository roleRepository;
+   // private RoleRepository roleRepository;
     @Autowired
     private UserRepository userRepository;
     Room r=new Room();
@@ -51,11 +50,23 @@ public class ReservationInitServiceImpl implements IReservationInitService{
 
     @Override
     public void initReservation() {
-    b.setDuration(4L);
     b.setDescription("BookingTest");
     b.setUser(u);
     b.setRoom(r);
     r.setRoomstate(RoomStatus.reserved);
+    b.setReservationCode(UUID.randomUUID().toString());
     bookingRepository.save(b);
     }
+
+ @Override
+ public Room addroom(Room r) {
+  r.setCapacity(50);
+  r.setNumber("S03");
+  r.setRoomstate(RoomStatus.available);
+  return roomRepository.save(r);
+ }
+ public List<Room> FindAllRooms(){
+     return roomRepository.findAll();
+ }
+
 }
