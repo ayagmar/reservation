@@ -57,7 +57,7 @@ public class ReservationInitServiceImpl implements IReservationInitService{
     b.setReservationCode(UUID.randomUUID().toString());
     bookingRepository.save(b);
     }
-
+/*
  @Override
  public Room addroom(Room r) {
   r.setCapacity(50);
@@ -68,5 +68,5 @@ public class ReservationInitServiceImpl implements IReservationInitService{
  public List<Room> FindAllRooms(){
      return roomRepository.findAll();
  }
-
+*/
 }
