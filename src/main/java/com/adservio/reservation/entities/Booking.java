@@ -1,5 +1,6 @@
 package com.adservio.reservation.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -29,7 +30,6 @@ public class Booking implements Serializable {
 
     @ManyToOne
     private User user;
-
     @ManyToOne
     private Room room;
 

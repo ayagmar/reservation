@@ -1,5 +1,7 @@
 package com.adservio.reservation.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -21,12 +23,11 @@ public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String number;
+    private String name;
     private Integer capacity;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomStatus roomstate;
-
     @OneToMany(mappedBy = "room")
     @ToString.Exclude
     private List<Booking> Reservation = new ArrayList<>();

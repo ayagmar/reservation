@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -29,14 +28,19 @@ public class ReservationInitServiceImpl implements IReservationInitService{
     @Autowired
     private UserRepository userRepository;
     Room r=new Room();
+    Room s=new Room();
     User u=new User();
     Booking b =new Booking();
     @Override
     public void initRooms() {
     r.setCapacity(15);
-    r.setNumber("S01");
+    r.setName("S01");
     r.setRoomstate(RoomStatus.available);
     roomRepository.save(r);
+    s.setName("S02");
+    s.setCapacity(10);
+    s.setRoomstate(RoomStatus.available);
+    roomRepository.save(s);
     }
 
     @Override

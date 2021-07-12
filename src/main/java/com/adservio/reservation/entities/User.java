@@ -1,5 +1,6 @@
 package com.adservio.reservation.entities;
 
+import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -29,11 +30,7 @@ public class User implements Serializable {
     private String Password;
 
 
-/*
-@OneToMany(cascade = CascadeType.ALL)
-@ToString.Exclude
-private List<Booking> reservations=new ArrayList<>();
-*/
+
 @OneToMany(mappedBy = "user")
 @ToString.Exclude
 private Collection<Booking> reservation;
