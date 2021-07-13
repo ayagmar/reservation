@@ -34,7 +34,7 @@ public class Room implements Serializable {
     private Collection<Booking> reservation;
 
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.PERSIST)
     private Department department;
 
 

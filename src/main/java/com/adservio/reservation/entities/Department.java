@@ -21,7 +21,7 @@ public class Department implements Serializable {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "department" ,cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @ToString.Exclude
     private Collection<Room> room;
 
