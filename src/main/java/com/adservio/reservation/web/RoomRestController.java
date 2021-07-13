@@ -21,14 +21,8 @@ public class RoomRestController {
         return service.listAll();
     }
     @GetMapping("/room/{id}")
-    public ResponseEntity<Room> get(@PathVariable Long id){
-        try{
-            Room room= service.get(id);
-            return new ResponseEntity<Room>(room, HttpStatus.OK);
-
-        }catch(NoSuchElementException e){
-            return new ResponseEntity<Room>(HttpStatus.NOT_FOUND);
-        }
+    public Room findRoomById(@PathVariable Long id) {
+        return service.get(id);
     }
 
 

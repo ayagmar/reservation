@@ -6,7 +6,8 @@ public interface IReservationInitService {
     void initRooms();
     void initUser();
     void initReservation();
-   // Room addroom(Room r);
+    void initDepartment();
+
 
 
 

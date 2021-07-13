@@ -5,8 +5,10 @@ import com.adservio.reservation.entities.Room;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 @Service
+@Transactional
 public class RoomService {
 
     @Autowired
@@ -43,8 +45,8 @@ public String deleteRoom(Long id){
 
 public Room updateRoom(Room room){
         Room eroom=roomRepository.findById(room.getId()).orElse(null);
-        eroom.setName(room.getName());
-        eroom.setCapacity(room.getCapacity());
+    assert eroom != null;
+    eroom.setName(room.getName());
         eroom.setRoomstate(room.getRoomstate());
         return roomRepository.save(eroom);
 }

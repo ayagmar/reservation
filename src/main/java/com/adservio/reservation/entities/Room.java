@@ -1,5 +1,6 @@
 package com.adservio.reservation.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
@@ -8,6 +9,7 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,13 +26,16 @@ public class Room implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Integer capacity;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomStatus roomstate;
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room",cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Booking> Reservation = new ArrayList<>();
+    private Collection<Booking> reservation;
+
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Department department;
 
 
 

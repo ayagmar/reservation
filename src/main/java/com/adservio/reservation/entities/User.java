@@ -1,11 +1,10 @@
 package com.adservio.reservation.entities;
 
-import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.awt.print.Book;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -34,16 +33,6 @@ public class User implements Serializable {
 @OneToMany(mappedBy = "user")
 @ToString.Exclude
 private Collection<Booking> reservation;
-
-
-
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private List<Role> roles = new ArrayList<>();
 
 
 

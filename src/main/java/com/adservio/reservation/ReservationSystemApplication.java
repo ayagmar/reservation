@@ -16,8 +16,10 @@ public class ReservationSystemApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        reservationInitService.initDepartment();
         reservationInitService.initUser();
         reservationInitService.initRooms();
         reservationInitService.initReservation();
+
     }
 }
