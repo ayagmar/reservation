@@ -1,41 +1,27 @@
 package com.adservio.reservation.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.Hibernate;
+
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Objects;
+
 
 @Entity
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Department implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @ToString.Exclude
+    @OneToMany(mappedBy = "department",cascade = CascadeType.ALL)
+    @JsonIgnore
     private Collection<Room> room;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Department that = (Department) o;
 
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return 1487346027;
-    }
 }
