@@ -2,13 +2,11 @@ package com.adservio.reservation.web;
 
 
 import com.adservio.reservation.entities.Room;
+import com.adservio.reservation.entities.dto.RoomDTO;
 import com.adservio.reservation.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api")
@@ -16,31 +14,31 @@ public class RoomRestController {
 
     @Autowired
     private RoomService service;
-    @GetMapping("/room")
-    public List<Room> findAllRooms(){
+    @GetMapping("/rooms")
+    public List<RoomDTO> findAllRooms(){
         return service.listAll();
     }
     @GetMapping("/room/{id}")
-    public Room findRoomById(@PathVariable Long id) {
-        return service.get(id);
+    public RoomDTO findRoomById(@PathVariable Long id) {
+        return service.getById(id);
     }
-
-
+    @GetMapping("/room/{name}")
+    public RoomDTO findDepartmentByName(@PathVariable String name) {
+        return service.getRoomByName(name);
+    }
     @PostMapping("/room/add")
-    public Room addRoom(@RequestBody Room room){
-        return service.save(room);
+    public RoomDTO addRoom(@RequestBody RoomDTO roomdto){
+        return service.save(roomdto);
     }
     @PostMapping("/room/addrooms")
-    public List<Room> addRooms(@RequestBody List<Room> rooms){
+    public List<RoomDTO> addRooms(@RequestBody List<RoomDTO> rooms){
     return service.saveRooms(rooms);
     }
-
     @PutMapping("/room/update")
     public Room updateRoom(@RequestBody Room room) {
         return service.updateRoom(room);
     }
-
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/room/delete/{id}")
     public String deleteRoom(@PathVariable Long id) {
         return service.deleteRoom(id);
     }

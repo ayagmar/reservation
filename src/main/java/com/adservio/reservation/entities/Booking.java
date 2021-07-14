@@ -18,7 +18,7 @@ public class Booking implements Serializable {
     Date StartDate;
     Date EndDate;
     private String description;
-    private String bookingCode;
+    private String code;
 
     @ManyToOne
     private User user;

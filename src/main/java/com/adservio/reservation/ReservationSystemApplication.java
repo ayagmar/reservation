@@ -18,6 +18,7 @@ public class ReservationSystemApplication implements CommandLineRunner {
 
     @Autowired
     private IReservationInitService reservationInitService;
+
     public static void main(String[] args) {
         SpringApplication.run(ReservationSystemApplication.class, args);
     }
