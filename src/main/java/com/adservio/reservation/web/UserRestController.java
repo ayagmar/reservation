@@ -2,6 +2,7 @@ package com.adservio.reservation.web;
 
 
 import com.adservio.reservation.entities.dto.UserDTO;
+import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class UserRestController {
         return service.listAll();
     }
     @GetMapping("/findID/{id}")
-    public UserDTO findUserById(@PathVariable Long id) {
+    public UserDTO findUserById(@PathVariable Long id) throws NotFoundException {
         return service.getById(id);
     }
     @GetMapping("/findEMAIL/{email}")
@@ -44,6 +45,7 @@ public class UserRestController {
     */
     @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
-        return service.deleteUser(id);
+         service.deleteUser(id);
+         return "Delete successfully";
     }
 }

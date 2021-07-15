@@ -2,7 +2,9 @@ package com.adservio.reservation.web;
 
 
 import com.adservio.reservation.entities.Room;
+import com.adservio.reservation.entities.dto.DepartmentDTO;
 import com.adservio.reservation.entities.dto.RoomDTO;
+import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoomService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -22,7 +24,7 @@ public class RoomRestController {
         return service.listAll();
     }
     @GetMapping("/findID/{id}")
-    public RoomDTO findRoomById(@PathVariable Long id) {
+    public RoomDTO findRoomById(@PathVariable Long id) throws NotFoundException {
         return service.getById(id);
     }
     @GetMapping("/findNAME/{name}")
@@ -37,10 +39,12 @@ public class RoomRestController {
     public List<RoomDTO> addRooms(@RequestBody List<RoomDTO> rooms){
     return service.saveRooms(rooms);
     }
-    @PutMapping("/update")
-    public Room updateRoom(@RequestBody Room room) {
-        return service.updateRoom(room);
+    @PutMapping("/update/{id}")
+    public RoomDTO updateRoom(@PathVariable("id") Long id,
+                                          @RequestBody RoomDTO room) {
+        return service.updateRoom(id,room);
     }
+
     @DeleteMapping("/delete/{id}")
     public String deleteRoom(@PathVariable Long id) {
         return service.deleteRoom(id);

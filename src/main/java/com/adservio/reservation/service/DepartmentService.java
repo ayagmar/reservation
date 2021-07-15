@@ -3,12 +3,15 @@ package com.adservio.reservation.service;
 import com.adservio.reservation.dao.DepartmentRepository;
 import com.adservio.reservation.entities.Department;
 import com.adservio.reservation.entities.dto.DepartmentDTO;
+import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.DepartmentConvert;
 
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -29,10 +32,12 @@ public class DepartmentService {
         return converter.entityToDto(departmentRepository.findAll());
     }
 
-    public DepartmentDTO getById(Long id){
-
-        return converter.entityToDto(departmentRepository.findById(id).orElse(null));
+    public DepartmentDTO getById(Long id) throws NotFoundException {
+        Optional<Department> department=departmentRepository.findById(id);
+        if(department.isEmpty()) throw new NotFoundException("Department Not Available");
+        return converter.entityToDto(department.get());
     }
+
 
     public DepartmentDTO GetDepartmentByName(String name) {
         return converter.entityToDto(departmentRepository.findByName(name));
@@ -54,6 +59,22 @@ public class DepartmentService {
     public String deleteDepartment(Long id){
         departmentRepository.deleteById(id);
         return "Deleted successfully";
+    }
+
+
+    public DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentdto) {
+
+        Department depDB = departmentRepository.findById(id).get();
+
+        if(Objects.nonNull(departmentdto.getName()) &&
+                !"".equalsIgnoreCase(departmentdto.getName())) {
+            depDB.setName(departmentdto.getName());
+        }
+        departmentRepository.save(depDB);
+
+
+    return converter.entityToDto(depDB);
+
     }
 
 }

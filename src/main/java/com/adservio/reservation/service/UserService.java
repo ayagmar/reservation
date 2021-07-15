@@ -3,11 +3,13 @@ package com.adservio.reservation.service;
 import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.entities.User;
 import com.adservio.reservation.entities.dto.UserDTO;
+import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.UserConvert;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,9 +27,11 @@ public class UserService {
         return converter.entityToDto(userRepository.findAll());
     }
 
-    public UserDTO getById(Long id){
+    public UserDTO getById(Long id) throws NotFoundException{
 
-        return converter.entityToDto(userRepository.findById(id).orElse(null));
+        Optional<User> user=userRepository.findById(id);
+        if(user.isEmpty()) throw new NotFoundException("User Not Available");
+        return converter.entityToDto(user.get());
     }
 
     public UserDTO GetUserByEmail(String email) {
@@ -47,9 +51,8 @@ public class UserService {
 
     }
 
-    public String deleteUser(Long id){
+    public void deleteUser(Long id){
         userRepository.deleteById(id);
-        return "Deleted successfully";
     }
 
 

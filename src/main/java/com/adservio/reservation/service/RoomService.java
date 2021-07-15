@@ -3,11 +3,15 @@ package com.adservio.reservation.service;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.entities.dto.RoomDTO;
+import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.RoomConvert;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 @Service
 @Transactional
 public class RoomService {
@@ -21,19 +25,21 @@ public class RoomService {
         this.converter = converter;
     }
 
-    public List<RoomDTO> listAll(){
+    public List<RoomDTO> listAll() {
 
         return converter.entityToDto(roomRepository.findAll());
     }
 
-    public RoomDTO getById(Long id){
+    public RoomDTO getById(Long id) throws NotFoundException {
 
-        return converter.entityToDto(roomRepository.findById(id).orElse(null));
+        Optional<Room> room = roomRepository.findById(id);
+        if (room.isEmpty()) throw new NotFoundException("Room Not Available");
+        return converter.entityToDto(room.get());
     }
 
-    public List<RoomDTO> saveRooms(List<RoomDTO> roomsdto){
-        List<Room> rooms=converter.dtoToEntity(roomsdto);
-        rooms=roomRepository.saveAll(rooms);
+    public List<RoomDTO> saveRooms(List<RoomDTO> roomsdto) {
+        List<Room> rooms = converter.dtoToEntity(roomsdto);
+        rooms = roomRepository.saveAll(rooms);
         return converter.entityToDto(rooms);
 
     }
@@ -43,24 +49,30 @@ public class RoomService {
         return converter.entityToDto(roomRepository.findByName(name));
     }
 
-    public RoomDTO save(RoomDTO roomdto){
-    Room room=converter.dtoToEntity(roomdto);
-    room=roomRepository.save(room);
-    return converter.entityToDto(room);
+    public RoomDTO save(RoomDTO roomdto) {
+        Room room = converter.dtoToEntity(roomdto);
+        room = roomRepository.save(room);
+        return converter.entityToDto(room);
     }
 
 
-
-
-public String deleteRoom(Long id){
+    public String deleteRoom(Long id) {
         roomRepository.deleteById(id);
         return "Deleted successfully";
-}
+    }
 
-public Room updateRoom(Room room){
-        Room eroom=roomRepository.findById(room.getId()).orElse(null);
-        assert eroom != null;
-        eroom.setName(room.getName());
-        return roomRepository.save(eroom);
-}
+    public RoomDTO updateRoom(Long id, RoomDTO roomDTO) {
+
+        Room roomDB = roomRepository.findById(id).get();
+
+        if (Objects.nonNull(roomDTO.getName()) &&
+                !"".equalsIgnoreCase(roomDTO.getName())) {
+            roomDB.setName(roomDTO.getName());
+        }
+        roomRepository.save(roomDB);
+
+
+        return converter.entityToDto(roomDB);
+    }
+
 }

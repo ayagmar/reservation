@@ -1,5 +1,6 @@
 package com.adservio.reservation.web;
 import com.adservio.reservation.entities.dto.BookingDTO;
+import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.BookingService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class BookingRestController {
     }
 
     @GetMapping("/findID/{id}")
-    public BookingDTO findBookingById(@PathVariable Long id) {
+    public BookingDTO findBookingById(@PathVariable Long id) throws NotFoundException {
         return service.getById(id);
     }
 
