@@ -2,10 +2,8 @@ package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.entities.User;
-import com.adservio.reservation.entities.dto.DepartmentDTO;
 import com.adservio.reservation.entities.dto.UserDTO;
 import com.adservio.reservation.mapper.UserConvert;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -14,10 +12,13 @@ import java.util.List;
 @Service
 @Transactional
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserConvert converter;
+    private final UserRepository userRepository;
+    private final UserConvert converter;
+
+    public UserService(UserRepository userRepository, UserConvert converter) {
+        this.userRepository = userRepository;
+        this.converter = converter;
+    }
 
     public List<UserDTO> listAll(){
 

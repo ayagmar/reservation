@@ -4,7 +4,6 @@ import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.entities.dto.RoomDTO;
 import com.adservio.reservation.mapper.RoomConvert;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -13,11 +12,14 @@ import java.util.List;
 @Transactional
 public class RoomService {
 
-    @Autowired
-    private RoomRepository roomRepository;
+    private final RoomRepository roomRepository;
 
-    @Autowired
-   private RoomConvert converter;
+    private final RoomConvert converter;
+
+    public RoomService(RoomRepository roomRepository, RoomConvert converter) {
+        this.roomRepository = roomRepository;
+        this.converter = converter;
+    }
 
     public List<RoomDTO> listAll(){
 

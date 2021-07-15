@@ -6,7 +6,7 @@ import com.adservio.reservation.dao.DepartmentRepository;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.entities.*;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 
@@ -16,15 +16,17 @@ import java.util.UUID;
 @Service
 @Transactional
 public class IReservationInitService {
-    @Autowired
-    private BookingRepository bookingRepository;
-    @Autowired
-    private RoomRepository roomRepository;
-    // private RoleRepository roleRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private DepartmentRepository departmentRepository;
+    private final BookingRepository bookingRepository;
+    private final RoomRepository roomRepository;
+    private final UserRepository userRepository;
+    private final DepartmentRepository departmentRepository;
+
+    public IReservationInitService(BookingRepository bookingRepository, RoomRepository roomRepository, UserRepository userRepository, DepartmentRepository departmentRepository) {
+        this.bookingRepository = bookingRepository;
+        this.roomRepository = roomRepository;
+        this.userRepository = userRepository;
+        this.departmentRepository = departmentRepository;
+    }
 
     public void initRooms() {
         Room r =new Room();

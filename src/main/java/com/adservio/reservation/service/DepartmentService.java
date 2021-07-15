@@ -4,7 +4,7 @@ import com.adservio.reservation.dao.DepartmentRepository;
 import com.adservio.reservation.entities.Department;
 import com.adservio.reservation.entities.dto.DepartmentDTO;
 import com.adservio.reservation.mapper.DepartmentConvert;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -13,10 +13,15 @@ import java.util.List;
 @Service
 @Transactional
 public class DepartmentService {
-    @Autowired
+    final
     DepartmentRepository departmentRepository;
-    @Autowired
+    final
     DepartmentConvert converter;
+
+    public DepartmentService(DepartmentRepository departmentRepository, DepartmentConvert converter) {
+        this.departmentRepository = departmentRepository;
+        this.converter = converter;
+    }
 
 
     public List<DepartmentDTO> listAll(){

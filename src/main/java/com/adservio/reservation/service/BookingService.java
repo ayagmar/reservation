@@ -4,18 +4,23 @@ import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.dto.BookingDTO;
 import com.adservio.reservation.mapper.BookingConvert;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
 public class BookingService {
-    @Autowired
+    final
     BookingRepository bookingRepository;
-    @Autowired
+    final
     BookingConvert converter;
+
+    public BookingService(BookingRepository bookingRepository, BookingConvert converter) {
+        this.bookingRepository = bookingRepository;
+        this.converter = converter;
+    }
 
     public List<BookingDTO> listAll(){
 
@@ -33,6 +38,7 @@ public class BookingService {
 
 
     public BookingDTO save(BookingDTO bookingDTO){
+        bookingDTO.setBookingCode(UUID.randomUUID().toString());
         Booking booking=converter.dtoToEntity(bookingDTO);
         booking=bookingRepository.save(booking);
         return converter.entityToDto(booking);
