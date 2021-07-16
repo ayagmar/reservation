@@ -6,6 +6,7 @@ import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,19 +31,19 @@ public class UserRestController {
         return service.GetUserByEmail(email);
     }
     @PostMapping("/add")
-    public UserDTO addUser(@RequestBody UserDTO userDTO){
+    public UserDTO addUser(@Valid @RequestBody UserDTO userDTO){
         return service.save(userDTO);
     }
     @PostMapping("/addull")
     public List<UserDTO> addUsers(@RequestBody List<UserDTO> userDTOS){
         return service.saveUsers(userDTOS);
     }
-    /*
-    @PutMapping("/room/update")
-    public User updateRoom(@RequestBody User user) {
-        return service.updateUser(user);
+
+    @PutMapping("/update/{id}")
+    public UserDTO updateUser(@PathVariable("id") Long id,
+                              @RequestBody UserDTO user) {
+        return service.updateUser(id,user);
     }
-    */
     @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
          service.deleteUser(id);

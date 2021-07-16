@@ -56,9 +56,8 @@ public class RoomService {
     }
 
 
-    public String deleteRoom(Long id) {
+    public void deleteRoom(Long id) {
         roomRepository.deleteById(id);
-        return "Deleted successfully";
     }
 
     public RoomDTO updateRoom(Long id, RoomDTO roomDTO) {

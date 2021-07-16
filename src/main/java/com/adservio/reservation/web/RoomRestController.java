@@ -47,7 +47,8 @@ public class RoomRestController {
 
     @DeleteMapping("/delete/{id}")
     public String deleteRoom(@PathVariable Long id) {
-        return service.deleteRoom(id);
+        service.deleteRoom(id);
+        return "Deleted successfully";
     }
 
 

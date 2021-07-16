@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -55,6 +56,26 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+
+
+
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
+
+        User userDB = userRepository.findById(id).get();
+
+        if (Objects.nonNull(userDTO.getEmail()) && !"".equalsIgnoreCase(userDTO.getEmail())) {
+            userDB.setEmail(userDB.getEmail());
+        }
+        if (Objects.nonNull(userDTO.getPassword()) &&
+                !"".equalsIgnoreCase(userDTO.getPassword())) {
+            userDB.setPassword(userDB.getPassword());
+        }
+        userDB.setFirstName(userDTO.getFirstName());
+        userDB.setLastName(userDTO.getLastName());
+        userRepository.save(userDB);
+
+        return converter.entityToDto(userDB);
+    }
 
 
 
