@@ -20,7 +20,7 @@ public class Booking implements Serializable {
     private String description;
     private String code;
 
-    @ManyToOne
+    @OneToOne
     private User user;
     @ManyToOne
     private Room room;

@@ -16,7 +16,7 @@ public class UserDTO {
     @Email
     @NotBlank(message = "Please enter the email")
     private String email;
-    @Length(max=16,min=4)
+    @Length(max=30,min=6)
     @NotBlank(message="Please enter the password")
     private String Password;
     private Collection<BookingDTO> bookings;

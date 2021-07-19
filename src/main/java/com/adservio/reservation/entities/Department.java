@@ -6,6 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -21,7 +22,7 @@ public class Department implements Serializable {
 
     @OneToMany(mappedBy = "department",cascade = CascadeType.ALL)
     @JsonIgnore
-    private Collection<Room> room;
+    private Collection<Room> room=new ArrayList<>();
 
 
 }

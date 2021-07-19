@@ -23,12 +23,14 @@ public class User implements Serializable {
     private String email;
     @Column(nullable = false,length = 40)
     private String Password;
+    private boolean active;
 
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    private Collection<Role> roles = new ArrayList<>();
 
-
-    @OneToMany(mappedBy = "user")
+    @ManyToMany(cascade = CascadeType.ALL)
     @JsonIgnore
-    private Collection<Booking> reservation;
+    private Collection<Booking> reservation=new ArrayList<>();
 
 
 

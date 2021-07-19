@@ -1,6 +1,5 @@
 package com.adservio.reservation.exception;
 
-import com.adservio.reservation.entities.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

@@ -1,10 +1,7 @@
 package com.adservio.reservation.service;
 
-import com.adservio.reservation.dao.BookingRepository;
-//import com.adservio.reservation.dao.RoleRepository;
-import com.adservio.reservation.dao.DepartmentRepository;
-import com.adservio.reservation.dao.RoomRepository;
-import com.adservio.reservation.dao.UserRepository;
+import com.adservio.reservation.dao.*;
+
 import com.adservio.reservation.entities.*;
 
 import org.springframework.stereotype.Service;
@@ -20,12 +17,14 @@ public class IReservationInitService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
+    private final RoleRepository roleRepository;
 
-    public IReservationInitService(BookingRepository bookingRepository, RoomRepository roomRepository, UserRepository userRepository, DepartmentRepository departmentRepository) {
+    public IReservationInitService(BookingRepository bookingRepository, RoomRepository roomRepository, UserRepository userRepository, DepartmentRepository departmentRepository, RoleRepository roleRepository) {
         this.bookingRepository = bookingRepository;
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
+        this.roleRepository = roleRepository;
     }
 
     public void initRooms() {
@@ -72,6 +71,14 @@ public class IReservationInitService {
         y.setName("Finance");
         departmentRepository.save(x);
         departmentRepository.save(y);
+    }
+
+    public void initRoles(){
+        Role R=new Role();
+        R.setRoleName(EnumRole.ADMIN);
+        Role U=new Role();
+        U.setRoleName(EnumRole.EMPLOYEE);
+
     }
 
 }

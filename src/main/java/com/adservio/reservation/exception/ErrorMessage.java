@@ -1,4 +1,4 @@
-package com.adservio.reservation.entities;
+package com.adservio.reservation.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

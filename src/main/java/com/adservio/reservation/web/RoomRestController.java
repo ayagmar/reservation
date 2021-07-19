@@ -1,8 +1,4 @@
 package com.adservio.reservation.web;
-
-
-import com.adservio.reservation.entities.Room;
-import com.adservio.reservation.entities.dto.DepartmentDTO;
 import com.adservio.reservation.entities.dto.RoomDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoomService;
