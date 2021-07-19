@@ -30,11 +30,11 @@ public class UserRestController {
     public UserDTO findUserByEmail(@PathVariable String email) {
         return service.GetUserByEmail(email);
     }
-    @PostMapping("/add")
+    @PostMapping("/save")
     public UserDTO addUser(@Valid @RequestBody UserDTO userDTO){
         return service.save(userDTO);
     }
-    @PostMapping("/addull")
+    @PostMapping("/save/all")
     public List<UserDTO> addUsers(@RequestBody List<UserDTO> userDTOS){
         return service.saveUsers(userDTOS);
     }

@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
 public class ReservationSystemApplication implements CommandLineRunner {
@@ -14,6 +15,10 @@ public class ReservationSystemApplication implements CommandLineRunner {
     @Bean
     public ModelMapper modelMapper(){
         return new ModelMapper();
+    }
+    @Bean
+    BCryptPasswordEncoder getBCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Autowired
@@ -25,9 +30,10 @@ public class ReservationSystemApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        reservationInitService.initRoles();
         reservationInitService.initDepartment();
-        reservationInitService.initUser();
         reservationInitService.initRooms();
+        reservationInitService.initUser();
         reservationInitService.initReservation();
 
     }

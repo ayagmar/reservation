@@ -6,8 +6,8 @@ import com.adservio.reservation.entities.dto.RoomDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.RoomConvert;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

@@ -5,10 +5,9 @@ import com.adservio.reservation.dao.*;
 import com.adservio.reservation.entities.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
-
-import javax.transaction.Transactional;
 import java.util.UUID;
 @Service
 @Transactional
@@ -49,6 +48,8 @@ public class IReservationInitService {
         u.setFirstName("test");
         u.setPassword("password");
         u.setLastName("test12");
+        u.getRoles().add(roleRepository.findByRoleName("ADMIN"));
+        u.setActive(true);
         userRepository.save(u);
     }
 
@@ -75,9 +76,11 @@ public class IReservationInitService {
 
     public void initRoles(){
         Role R=new Role();
-        R.setRoleName(EnumRole.ADMIN);
+        R.setRoleName("ADMIN");
+        roleRepository.save(R);
         Role U=new Role();
-        U.setRoleName(EnumRole.EMPLOYEE);
+        U.setRoleName("USER");
+        roleRepository.save(U);
 
     }
 

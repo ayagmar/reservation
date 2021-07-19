@@ -1,6 +1,8 @@
 package com.adservio.reservation.service;
 
+import com.adservio.reservation.dao.RoleRepository;
 import com.adservio.reservation.dao.UserRepository;
+import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
 import com.adservio.reservation.entities.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
@@ -16,10 +18,12 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserConvert converter;
 
-    public UserService(UserRepository userRepository, UserConvert converter) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, UserConvert converter) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.converter = converter;
     }
 
@@ -41,6 +45,7 @@ public class UserService {
 
     public UserDTO save(UserDTO userDTO){
         User user=converter.dtoToEntity(userDTO);
+        user.getRoles().add(roleRepository.findByRoleName("USER"));
         user=userRepository.save(user);
         return converter.entityToDto(user);
     }

@@ -18,9 +18,9 @@ public class RoomConvert {
         return mapper.map(room,RoomDTO.class);
 
     }
-    public List<RoomDTO> entityToDto(List<Room> student) {
+    public List<RoomDTO> entityToDto(List<Room> rooms) {
 
-        return	student.stream().map(this::entityToDto).collect(Collectors.toList());
+        return	rooms.stream().map(this::entityToDto).collect(Collectors.toList());
 
     }
 

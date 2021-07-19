@@ -32,7 +32,4 @@ public class User implements Serializable {
     @JsonIgnore
     private Collection<Booking> reservation=new ArrayList<>();
 
-
-
-
 }

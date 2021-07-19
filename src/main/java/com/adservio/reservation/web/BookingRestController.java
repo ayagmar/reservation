@@ -31,12 +31,12 @@ public class BookingRestController {
     public BookingDTO findBookingByEmail(@PathVariable String code) {
         return service.getBookingByCode(code);
     }
-    @PostMapping("/add")
+    @PostMapping("/save")
     public BookingDTO addBooking(@RequestBody BookingDTO bookingDTO){
         return service.save(bookingDTO);
     }
 
-    @PostMapping("/addall")
+    @PostMapping("/save/all")
     public List<BookingDTO> addBookings(@RequestBody List<BookingDTO> bookingDTOS){
         return service.saveDepartments(bookingDTOS);
     }

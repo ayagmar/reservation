@@ -27,11 +27,11 @@ public class RoomRestController {
     public RoomDTO findRoomByName(@PathVariable String name) {
         return service.getRoomByName(name);
     }
-    @PostMapping("/add")
+    @PostMapping("/save")
     public RoomDTO addRoom(@RequestBody RoomDTO roomdto){
         return service.save(roomdto);
     }
-    @PostMapping("/addall")
+    @PostMapping("/save/all")
     public List<RoomDTO> addRooms(@RequestBody List<RoomDTO> rooms){
     return service.saveRooms(rooms);
     }

@@ -32,13 +32,13 @@ public class DepartmentRestController {
     public ResponseEntity<DepartmentDTO> findDepartmentByName(@PathVariable String name) {
         return new ResponseEntity<>(service.GetDepartmentByName(name),HttpStatus.OK);
     }
-    @PostMapping("/add")
+    @PostMapping("/save")
     public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO){
         DepartmentDTO newDepartment= service.save(departmentDTO);
         return new ResponseEntity<>(newDepartment, HttpStatus.CREATED);
     }
 
-    @PostMapping("/addall")
+    @PostMapping("/save/all")
     public List<DepartmentDTO> addDepartments(@RequestBody List<DepartmentDTO> departmentDTOS){
         return service.saveDepartments(departmentDTOS);
     }

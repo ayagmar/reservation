@@ -19,5 +19,7 @@ public class UserDTO {
     @Length(max=30,min=6)
     @NotBlank(message="Please enter the password")
     private String Password;
+    private RoleDTO role;
     private Collection<BookingDTO> bookings;
+
 }
