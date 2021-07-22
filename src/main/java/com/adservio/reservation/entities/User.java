@@ -2,6 +2,10 @@ package com.adservio.reservation.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
@@ -19,10 +23,11 @@ public class User implements Serializable {
     private String FirstName;
     @Column(nullable = false,length = 40)
     private String LastName;
+    private String username;
     @Column(unique = true,length = 40,nullable = false)
     private String email;
-    @Column(nullable = false,length = 40)
-    private String Password;
+    @Column(nullable = false)
+    private String password;
     private boolean active;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
@@ -31,5 +36,6 @@ public class User implements Serializable {
     @ManyToMany(cascade = CascadeType.ALL)
     @JsonIgnore
     private Collection<Booking> reservation=new ArrayList<>();
+
 
 }

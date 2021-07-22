@@ -13,6 +13,7 @@ public class UserDTO {
     private Long id;
     private String FirstName;
     private String LastName;
+    private String username;
     @Email
     @NotBlank(message = "Please enter the email")
     private String email;

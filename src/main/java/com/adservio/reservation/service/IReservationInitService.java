@@ -45,6 +45,7 @@ public class IReservationInitService {
     public void initUser() {
         User u =new User();
         u.setEmail("test@gmail.com");
+        u.setUsername("user1");
         u.setFirstName("test");
         u.setPassword("password");
         u.setLastName("test12");
