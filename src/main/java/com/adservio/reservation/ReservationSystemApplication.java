@@ -1,6 +1,7 @@
 package com.adservio.reservation;
 
 import com.adservio.reservation.service.IReservationInitService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -10,7 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
+@RequiredArgsConstructor
 public class ReservationSystemApplication implements CommandLineRunner {
+
+    private final IReservationInitService reservationInitService;
 
     @Bean
     public ModelMapper modelMapper(){
@@ -21,8 +25,7 @@ public class ReservationSystemApplication implements CommandLineRunner {
         return new BCryptPasswordEncoder();
     }
 
-    @Autowired
-    private IReservationInitService reservationInitService;
+
 
     public static void main(String[] args) {
         SpringApplication.run(ReservationSystemApplication.class, args);
@@ -31,9 +34,9 @@ public class ReservationSystemApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         reservationInitService.initRoles();
+        reservationInitService.initUser();
         reservationInitService.initDepartment();
         reservationInitService.initRooms();
-        reservationInitService.initUser();
         reservationInitService.initReservation();
 
     }

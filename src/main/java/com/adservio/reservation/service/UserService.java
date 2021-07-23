@@ -7,29 +7,27 @@ import com.adservio.reservation.entities.User;
 import com.adservio.reservation.entities.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.UserConvert;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
-public class UserService {
+@RequiredArgsConstructor
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserConvert converter;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, UserConvert converter, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.converter = converter;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
     public List<UserDTO> listAll(){
         return converter.entityToDto(userRepository.findAll());
@@ -49,6 +47,7 @@ public class UserService {
     public UserDTO save(UserDTO userDTO){
         User user=converter.dtoToEntity(userDTO);
         user.getRoles().add(roleRepository.findByRoleName("USER"));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user=userRepository.save(user);
         return converter.entityToDto(user);
     }
@@ -84,9 +83,6 @@ public class UserService {
         return converter.entityToDto(userDB);
     }
 
-    public User loadUserByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
 
     public void addRoleToUser(String username, String rolename) {
         User appUser = userRepository.findByUsername(username);
@@ -94,18 +90,22 @@ public class UserService {
         appUser.getRoles().add(appRole);
     }
 
-//    public User saveUser(String username, String password, String confirmedPassword) {
-//        User user = userRepository.findByUsername(username);
-//        if (user != null) throw new RuntimeException("User already exists");
-//        if (!password.equals(confirmedPassword)) throw new RuntimeException("Please confirm your password !");
-//        User appUser = new User();
-//        appUser.setUsername(username);
-//        appUser.setPassword(bCryptPasswordEncoder.encode(password));
-//        appUser.setActive(true);
-//        userRepository.save(appUser);
-//        addRoleToUser(username, "USER");
-//        return appUser;
-//    }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user=userRepository.findByUsername(username);
+        if (user==null){
+            throw new UsernameNotFoundException("Username not found in database");
+        }
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        user.getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+        });
+        return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(),authorities);
+    }
+
+
+
+
 
 
 

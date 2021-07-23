@@ -4,6 +4,8 @@ import com.adservio.reservation.dao.*;
 
 import com.adservio.reservation.entities.*;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class IReservationInitService {
     private final BookingRepository bookingRepository;
     private final RoomRepository roomRepository;
@@ -18,26 +21,18 @@ public class IReservationInitService {
     private final DepartmentRepository departmentRepository;
     private final RoleRepository roleRepository;
 
-    public IReservationInitService(BookingRepository bookingRepository, RoomRepository roomRepository, UserRepository userRepository, DepartmentRepository departmentRepository, RoleRepository roleRepository) {
-        this.bookingRepository = bookingRepository;
-        this.roomRepository = roomRepository;
-        this.userRepository = userRepository;
-        this.departmentRepository = departmentRepository;
-        this.roleRepository = roleRepository;
-    }
-
     public void initRooms() {
         Room r =new Room();
         Room s =new Room();
         Room q=new Room();
-        r.setName("S01");
-        r.setDepartment(departmentRepository.getById(1L));
+        r.setName("Room01");
+        r.setDepartment(departmentRepository.findByName("Info"));
         roomRepository.save(r);
-        s.setName("S02");
-        s.setDepartment(departmentRepository.getById(1L));
+        s.setName("Room02");
+        s.setDepartment(departmentRepository.findByName("Info"));
         roomRepository.save(s);
-        q.setName("S03");
-        q.setDepartment(departmentRepository.getById(1L));
+        q.setName("Room03");
+        q.setDepartment(departmentRepository.findByName("Finance"));
         roomRepository.save(q);
     }
 
@@ -47,7 +42,7 @@ public class IReservationInitService {
         u.setEmail("test@gmail.com");
         u.setUsername("user1");
         u.setFirstName("test");
-        u.setPassword("password");
+        u.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u.setLastName("test12");
         u.getRoles().add(roleRepository.findByRoleName("ADMIN"));
         u.setActive(true);

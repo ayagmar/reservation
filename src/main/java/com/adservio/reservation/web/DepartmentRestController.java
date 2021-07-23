@@ -3,44 +3,47 @@ package com.adservio.reservation.web;
 import com.adservio.reservation.entities.dto.DepartmentDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.DepartmentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
+import java.util.Collection;
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/department")
 public class DepartmentRestController {
-    final
+   private final
     DepartmentService service;
-    public DepartmentRestController(DepartmentService service) {
-        this.service = service;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<DepartmentDTO>> findAllDepartments(){
-        return new ResponseEntity<>(service.listAll(),HttpStatus.OK);
+        return ResponseEntity.ok().body(service.listAll());
     }
 
     @GetMapping("/findID/{id}")
     public ResponseEntity<DepartmentDTO> findDepartmentById(@PathVariable Long id) throws NotFoundException {
-        return new ResponseEntity<>(service.getById(id),HttpStatus.OK);
+        return ResponseEntity.ok().body(service.getById(id));
     }
 
     @GetMapping("/findNAME/{name}")
     public ResponseEntity<DepartmentDTO> findDepartmentByName(@PathVariable String name) {
-        return new ResponseEntity<>(service.GetDepartmentByName(name),HttpStatus.OK);
+
+        return ResponseEntity.ok().body(service.GetDepartmentByName(name));
     }
     @PostMapping("/save")
     public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO){
-        DepartmentDTO newDepartment= service.save(departmentDTO);
-        return new ResponseEntity<>(newDepartment, HttpStatus.CREATED);
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/save").toUriString());
+        return  ResponseEntity.created(uri).body(service.save(departmentDTO));
     }
 
     @PostMapping("/save/all")
-    public List<DepartmentDTO> addDepartments(@RequestBody List<DepartmentDTO> departmentDTOS){
-        return service.saveDepartments(departmentDTOS);
+    public ResponseEntity<List<DepartmentDTO>> addDepartments(@RequestBody List<DepartmentDTO> departmentDTOS){
+    URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/save/all").toUriString());
+        return ResponseEntity.created(uri).body(service.saveDepartments(departmentDTOS));
     }
 
     @PutMapping("/update/{id}")

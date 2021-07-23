@@ -5,6 +5,7 @@ import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.dto.BookingDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,16 +15,12 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BookingService {
-    final
+   public final
     BookingRepository bookingRepository;
-    final
+    public final
     BookingConvert converter;
-
-    public BookingService(BookingRepository bookingRepository, BookingConvert converter) {
-        this.bookingRepository = bookingRepository;
-        this.converter = converter;
-    }
 
     public List<BookingDTO> listAll(){
 

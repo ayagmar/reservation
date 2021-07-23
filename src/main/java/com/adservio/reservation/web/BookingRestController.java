@@ -2,20 +2,18 @@ package com.adservio.reservation.web;
 import com.adservio.reservation.entities.dto.BookingDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.BookingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/booking")
 
 public class BookingRestController {
-    final
+    private final
     BookingService service;
 
-    public BookingRestController(BookingService service) {
-        this.service = service;
-    }
 
     @GetMapping("/all")
     public List<BookingDTO> findAllBookings(){

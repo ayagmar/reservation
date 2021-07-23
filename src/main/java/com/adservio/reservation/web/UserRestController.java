@@ -4,19 +4,16 @@ package com.adservio.reservation.web;
 import com.adservio.reservation.entities.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
 public class UserRestController {
     private final UserService service;
-
-    public UserRestController(UserService service) {
-        this.service = service;
-    }
 
     @GetMapping("/all")
     public List<UserDTO> findAllUsers(){

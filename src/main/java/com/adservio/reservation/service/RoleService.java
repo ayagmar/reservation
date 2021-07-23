@@ -5,6 +5,7 @@ import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.dto.RoleDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.RoleConvert;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -12,14 +13,12 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class RoleService {
     private final RoleRepository roleRepository;
     private final RoleConvert converter;
 
-    public RoleService(RoleRepository roleRepository, RoleConvert converter) {
-        this.roleRepository = roleRepository;
-        this.converter = converter;
-    }
+
 
     public List<RoleDTO> listAll() {
 

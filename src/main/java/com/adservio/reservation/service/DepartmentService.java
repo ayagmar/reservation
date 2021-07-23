@@ -6,6 +6,7 @@ import com.adservio.reservation.entities.dto.DepartmentDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.DepartmentConvert;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +16,14 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class DepartmentService {
-    final
+    public final
     DepartmentRepository departmentRepository;
-    final
+    public final
     DepartmentConvert converter;
 
-    public DepartmentService(DepartmentRepository departmentRepository, DepartmentConvert converter) {
-        this.departmentRepository = departmentRepository;
-        this.converter = converter;
-    }
+
 
 
     public List<DepartmentDTO> listAll(){

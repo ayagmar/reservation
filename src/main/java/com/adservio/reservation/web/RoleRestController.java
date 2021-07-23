@@ -2,18 +2,16 @@ package com.adservio.reservation.web;
 import com.adservio.reservation.entities.dto.RoleDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/Role")
 public class RoleRestController {
     private final RoleService service;
 
-    public RoleRestController(RoleService roleService) {
-        this.service = roleService;
-    }
     @GetMapping("/all")
     public List<RoleDTO> findAllRooms(){
         return service.listAll();

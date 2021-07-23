@@ -5,6 +5,7 @@ import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.entities.dto.RoomDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.RoomConvert;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,16 +15,13 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class RoomService {
 
     private final RoomRepository roomRepository;
 
     private final RoomConvert converter;
 
-    public RoomService(RoomRepository roomRepository, RoomConvert converter) {
-        this.roomRepository = roomRepository;
-        this.converter = converter;
-    }
 
     public List<RoomDTO> listAll() {
 
