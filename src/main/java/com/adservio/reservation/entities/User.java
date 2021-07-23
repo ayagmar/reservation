@@ -1,11 +1,6 @@
 package com.adservio.reservation.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
@@ -34,7 +29,7 @@ public class User implements Serializable {
     private Collection<Role> roles = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JsonIgnore
+
     private Collection<Booking> reservation=new ArrayList<>();
 
 

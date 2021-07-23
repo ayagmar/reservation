@@ -17,7 +17,6 @@ public class Room implements Serializable {
     private Long id;
     private String name;
     @Column(nullable = false)
-    @JsonIgnore
     @OneToMany(mappedBy = "room",cascade = CascadeType.ALL)
     private Collection<Booking> reservation;
 

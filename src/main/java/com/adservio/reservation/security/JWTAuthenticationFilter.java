@@ -1,5 +1,4 @@
 package com.adservio.reservation.security;
-
 import com.adservio.reservation.entities.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

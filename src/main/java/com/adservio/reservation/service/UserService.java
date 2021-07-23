@@ -43,6 +43,11 @@ public class UserService implements UserDetailsService {
         return converter.entityToDto(userRepository.findByEmail(email));
     }
 
+    public User GetUserByUsername(String username) {
+       return userRepository.findByEmail(username);
+    }
+
+
 
     public UserDTO save(UserDTO userDTO){
         User user=converter.dtoToEntity(userDTO);

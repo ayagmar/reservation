@@ -21,7 +21,7 @@ public class Department implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "department",cascade = CascadeType.ALL)
-    @JsonIgnore
+
     private Collection<Room> room=new ArrayList<>();
 
 
