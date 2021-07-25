@@ -36,13 +36,13 @@ public class DepartmentRestController {
     }
     @PostMapping("/save")
     public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO){
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/save").toUriString());
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/save").toUriString());
         return  ResponseEntity.created(uri).body(service.save(departmentDTO));
     }
 
     @PostMapping("/save/all")
     public ResponseEntity<List<DepartmentDTO>> addDepartments(@RequestBody List<DepartmentDTO> departmentDTOS){
-    URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/save/all").toUriString());
+    URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/save/all").toUriString());
         return ResponseEntity.created(uri).body(service.saveDepartments(departmentDTOS));
     }
 

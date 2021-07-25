@@ -26,7 +26,7 @@ public class BookingRestController {
     }
 
     @GetMapping("/findCODE/{code}")
-    public BookingDTO findBookingByEmail(@PathVariable String code) {
+    public BookingDTO findBookingByCode(@PathVariable String code) {
         return service.getBookingByCode(code);
     }
     @PostMapping("/save")
