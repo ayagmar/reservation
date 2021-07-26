@@ -38,7 +38,9 @@ public class DepartmentService {
     }
 
 
-    public DepartmentDTO GetDepartmentByName(String name) {
+    public DepartmentDTO GetDepartmentByName(String name) throws NotFoundException {
+        if(name.isEmpty()) throw new NotFoundException("Insert a name to find department");
+        if(departmentRepository.findByName(name)==null) throw new NotFoundException("Department not found");
         return converter.entityToDto(departmentRepository.findByName(name));
     }
 

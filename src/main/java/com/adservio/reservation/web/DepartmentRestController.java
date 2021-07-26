@@ -4,20 +4,24 @@ import com.adservio.reservation.entities.dto.DepartmentDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Collection;
+import java.net.URISyntaxException;
+
 import java.util.List;
+
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/department")
 public class DepartmentRestController {
    private final
     DepartmentService service;
+
+
 
     @GetMapping("/all")
     public ResponseEntity<List<DepartmentDTO>> findAllDepartments(){
@@ -30,14 +34,15 @@ public class DepartmentRestController {
     }
 
     @GetMapping("/findNAME/{name}")
-    public ResponseEntity<DepartmentDTO> findDepartmentByName(@PathVariable String name) {
+    public ResponseEntity<DepartmentDTO> findDepartmentByName(@PathVariable String name) throws NotFoundException {
 
         return ResponseEntity.ok().body(service.GetDepartmentByName(name));
     }
     @PostMapping("/save")
-    public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO){
+    public ResponseEntity<DepartmentDTO> CreateDepartment(@RequestBody DepartmentDTO departmentDTO)throws URISyntaxException {
+        DepartmentDTO result = service.save(departmentDTO);
         URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/save").toUriString());
-        return  ResponseEntity.created(uri).body(service.save(departmentDTO));
+        return  ResponseEntity.created(uri).body(result);
     }
 
     @PostMapping("/save/all")
@@ -47,9 +52,12 @@ public class DepartmentRestController {
     }
 
     @PutMapping("/update/{id}")
-    public DepartmentDTO updateDepartment(@PathVariable("id") Long departmentId,
-                                       @RequestBody DepartmentDTO department) {
-        return service.updateDepartment(departmentId,department);
+    public ResponseEntity<DepartmentDTO> updateDepartment(@PathVariable("id") Long departmentId,
+                                       @RequestBody DepartmentDTO department)  throws URISyntaxException{
+
+        DepartmentDTO result = service.updateDepartment(departmentId,department);
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/update/{id}").toUriString());
+        return  ResponseEntity.created(uri).body(result);
     }
 
     @DeleteMapping("/delete/{id}")

@@ -43,7 +43,9 @@ public class RoomService {
     }
 
 
-    public RoomDTO getRoomByName(String name) {
+    public RoomDTO getRoomByName(String name) throws NotFoundException {
+        if(name.isEmpty()) throw new NotFoundException("Insert a name to find room");
+        if(roomRepository.findByName(name)==null) throw new NotFoundException("Room not found");
         return converter.entityToDto(roomRepository.findByName(name));
     }
 
