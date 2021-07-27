@@ -65,10 +65,6 @@ public class UserRestController {
         return service.GetReservations(id);
     }
 
-    @GetMapping("/reservation/{id}")
-    public Collection<Booking> fetchReservations(@PathVariable Long id) {
-        return service.FetchReservation(id);
-    }
 
 
     @DeleteMapping("/delete/{id}")

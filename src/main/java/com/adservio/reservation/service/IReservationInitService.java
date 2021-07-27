@@ -7,11 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Book;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.time.LocalDateTime;
 import java.util.UUID;
 @Service
 @Transactional
@@ -22,7 +20,6 @@ public class IReservationInitService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final RoleRepository roleRepository;
-    SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.ENGLISH);
 
     public void initRooms() {
         Room r =new Room();
@@ -76,11 +73,11 @@ public class IReservationInitService {
 
     public void initReservation() throws ParseException {
 
-        String DateStart = "23-07-2021 10:15:55 AM";
-        String DateEnd = "23-07-2021 01:15:55 PM";
+        String DateStart = "2021-07-23T08:00:00";
+        String DateEnd = "2021-07-23T10:00:00";
 
-        Date dateS = formatter.parse(DateStart);
-        Date dateE = formatter.parse(DateEnd);
+        LocalDateTime dateS =LocalDateTime.parse(DateStart);
+        LocalDateTime dateE =LocalDateTime.parse(DateEnd);
         Booking b=new Booking();
         Booking b2=new Booking();
         Booking b3=new Booking();
@@ -91,12 +88,11 @@ public class IReservationInitService {
         b.setEndDate(dateE);
         b.setCode(UUID.randomUUID().toString());
         //----//
-        String DateStart2 = "25-07-2021 02:15:55 AM";
+        String DateStart2 = "2021-07-25T02:15:55";
+        String DateEnd2 = "2021-07-25T05:15:55";
 
-        String DateEnd2 = "25-07-2021 05:15:55 PM";
-
-        Date dateS2 = formatter.parse(DateStart2);
-        Date dateE2 = formatter.parse(DateEnd2);
+        LocalDateTime dateS2 =LocalDateTime.parse(DateStart2);
+        LocalDateTime dateE2 =LocalDateTime.parse(DateEnd2);
         b2.setDescription("BookingTest2");
         b2.setUser(userRepository.findByUsername("user1"));
         b2.setRoom(roomRepository.findByName("Room02"));
@@ -104,17 +100,20 @@ public class IReservationInitService {
         b2.setStartDate(dateS2);
         b2.setEndDate(dateE2);
         //----//
+        String DateStart3 = "2021-07-29T02:15:55";
+        String DateEnd3 = "2021-07-29T05:15:55";
+        LocalDateTime dateS3 =LocalDateTime.parse(DateStart3);
+        LocalDateTime dateE3 =LocalDateTime.parse(DateEnd3);
         b3.setDescription("BookingTest3");
         b3.setUser(userRepository.findByUsername("user2"));
         b3.setRoom(roomRepository.findByName("Room01"));
         b3.setCode(UUID.randomUUID().toString());
-        b3.setStartDate(dateS2);
-        b3.setEndDate(dateE2);
+        b3.setStartDate(dateS3);
+        b3.setEndDate(dateE3);
 
         bookingRepository.save(b);
         bookingRepository.save(b2);
         bookingRepository.save(b3);
-
 
     }
 

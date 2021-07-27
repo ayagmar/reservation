@@ -1,5 +1,7 @@
 package com.adservio.reservation;
 
+import com.adservio.reservation.dao.BookingRepository;
+import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.service.IReservationInitService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class ReservationSystemApplication implements CommandLineRunner {
 
     private final IReservationInitService reservationInitService;
+    private BookingRepository bookingRepository;
 
     @Bean
     public ModelMapper modelMapper(){
@@ -43,6 +46,8 @@ public class ReservationSystemApplication implements CommandLineRunner {
         reservationInitService.initDepartment();
         reservationInitService.initRooms();
         reservationInitService.initReservation();
+
+
 
     }
 }

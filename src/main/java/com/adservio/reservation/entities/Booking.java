@@ -13,14 +13,14 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 
-
 public class Booking implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Date StartDate;
-    private Date EndDate;
+    private LocalDateTime StartDate;
+    private LocalDateTime EndDate;
     private String description;
+    @Column(unique = true)
     private String code;
 
     @JsonIgnore

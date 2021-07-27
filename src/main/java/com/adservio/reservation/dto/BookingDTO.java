@@ -1,29 +1,26 @@
 package com.adservio.reservation.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.FutureOrPresent;
 import java.time.LocalDateTime;
-import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingDTO {
     private Long id;
     @FutureOrPresent
-    @Temporal(TemporalType.DATE)
-    Date StartDate;
-    @Temporal(TemporalType.DATE)
+    LocalDateTime StartDate;
     @FutureOrPresent
-    Date EndDate;
+    LocalDateTime EndDate;
     private String description;
-    private String bookingCode;
+    private String code;
+    @JsonIgnore
     private RoomDTO room;
+    @JsonIgnore
     private UserDTO user;
 
 }

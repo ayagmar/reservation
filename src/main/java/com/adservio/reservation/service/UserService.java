@@ -10,6 +10,7 @@ import com.adservio.reservation.entities.User;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
+import com.adservio.reservation.mapper.RoleConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class UserService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final UserConvert userconverter;
     private final BookingConvert bookingConvert;
+    private final RoleConvert roleConvert;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
@@ -57,6 +59,7 @@ public class UserService implements UserDetailsService {
 
 
     public UserDTO save(UserDTO userDTO){
+       // userDTO.setRole(roleConvert.entityToDto(roleRepository.findByRoleName(SecurityParams.USER)));
         User user= userconverter.dtoToEntity(userDTO);
         user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -83,11 +86,11 @@ public class UserService implements UserDetailsService {
         User userDB = userRepository.findById(id).get();
 
         if (Objects.nonNull(userDTO.getEmail()) && !"".equalsIgnoreCase(userDTO.getEmail())) {
-            userDB.setEmail(userDB.getEmail());
+            userDB.setEmail(userDTO.getEmail());
         }
         if (Objects.nonNull(userDTO.getPassword()) &&
                 !"".equalsIgnoreCase(userDTO.getPassword())) {
-            userDB.setPassword(userDB.getPassword());
+            userDB.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
         }
         userDB.setFirstName(userDTO.getFirstName());
         userDB.setLastName(userDTO.getLastName());
@@ -98,15 +101,10 @@ public class UserService implements UserDetailsService {
     public Collection<BookingDTO> GetReservations(Long id) throws NotFoundException {
        UserDTO userDTO=getById(id);
        User user= userconverter.dtoToEntity(userDTO);
-        Collection<Booking> list=user.getReservation();
+        Collection<Booking> list=user.getBookings();
         return bookingConvert.entityToDto(list);
     }
 
-    public Collection<Booking> FetchReservation(Long id) {
-        User user=userRepository.getById(id);
-        Collection<Booking> list=user.getReservation();
-        return list;
-    }
 
 
     public void addRoleToUser(String username, String rolename) {

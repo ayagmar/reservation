@@ -33,7 +33,6 @@ public class RoleConvert {
 
     public List<Role> dtoToEntity(List<RoleDTO> dto)
     {
-
         return dto.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
 }
