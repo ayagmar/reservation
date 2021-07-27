@@ -1,7 +1,7 @@
 package com.adservio.reservation.mapper;
 
 import com.adservio.reservation.entities.Role;
-import com.adservio.reservation.entities.dto.RoleDTO;
+import com.adservio.reservation.dto.RoleDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 

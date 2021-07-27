@@ -2,7 +2,7 @@ package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.RoleRepository;
 import com.adservio.reservation.entities.Role;
-import com.adservio.reservation.entities.dto.RoleDTO;
+import com.adservio.reservation.dto.RoleDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.RoleConvert;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class RoleService {
     public RoleDTO getById(Long id) throws NotFoundException {
 
         Optional<Role> role = roleRepository.findById(id);
-        if (role.isEmpty()) throw new NotFoundException("Room Not Available");
+        if (role.isEmpty()) throw new NotFoundException("Role Not Available");
         return converter.entityToDto(role.get());
     }
 

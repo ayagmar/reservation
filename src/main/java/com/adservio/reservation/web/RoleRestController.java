@@ -1,5 +1,5 @@
 package com.adservio.reservation.web;
-import com.adservio.reservation.entities.dto.RoleDTO;
+import com.adservio.reservation.dto.RoleDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoleService;
 import lombok.RequiredArgsConstructor;

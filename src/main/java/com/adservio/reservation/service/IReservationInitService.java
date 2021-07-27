@@ -2,6 +2,7 @@ package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.*;
 import com.adservio.reservation.entities.*;
+import com.adservio.reservation.security.SecurityParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +49,7 @@ public class IReservationInitService {
         u.setFirstName("Jhonny");
         u.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u.setLastName("Depp");
-        u.getRoles().add(roleRepository.findByRoleName("ADMIN"));
+        u.getRoles().add(roleRepository.findByRoleName(SecurityParams.ADMIN));
         u.setActive(true);
         //-----//
         u2.setEmail("User2Email@gmail.com");
@@ -56,7 +57,7 @@ public class IReservationInitService {
         u2.setFirstName("Daniel");
         u2.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u2.setLastName("Raddclif");
-        u2.getRoles().add(roleRepository.findByRoleName("USER"));
+        u2.getRoles().add(roleRepository.findByRoleName(SecurityParams.USER));
         u2.setActive(true);
         //-----//
         u3.setEmail("User3Email@gmail.com");
@@ -64,7 +65,7 @@ public class IReservationInitService {
         u3.setFirstName("Adam");
         u3.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u3.setLastName("Sandler");
-        u3.getRoles().add(roleRepository.findByRoleName("USER"));
+        u3.getRoles().add(roleRepository.findByRoleName(SecurityParams.USER));
         u3.setActive(true);
 
         userRepository.save(u);
@@ -77,6 +78,7 @@ public class IReservationInitService {
 
         String DateStart = "23-07-2021 10:15:55 AM";
         String DateEnd = "23-07-2021 01:15:55 PM";
+
         Date dateS = formatter.parse(DateStart);
         Date dateE = formatter.parse(DateEnd);
         Booking b=new Booking();
@@ -90,7 +92,9 @@ public class IReservationInitService {
         b.setCode(UUID.randomUUID().toString());
         //----//
         String DateStart2 = "25-07-2021 02:15:55 AM";
+
         String DateEnd2 = "25-07-2021 05:15:55 PM";
+
         Date dateS2 = formatter.parse(DateStart2);
         Date dateE2 = formatter.parse(DateEnd2);
         b2.setDescription("BookingTest2");
@@ -128,8 +132,8 @@ public class IReservationInitService {
     public void initRoles(){
         Role R=new Role();
         Role U=new Role();
-        R.setRoleName("ADMIN");
-        U.setRoleName("USER");
+        R.setRoleName(SecurityParams.ADMIN);
+        U.setRoleName(SecurityParams.USER);
         roleRepository.save(R);
         roleRepository.save(U);
     }

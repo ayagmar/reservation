@@ -1,8 +1,10 @@
 package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.BookingRepository;
+import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.entities.Booking;
-import com.adservio.reservation.entities.dto.BookingDTO;
+import com.adservio.reservation.entities.Room;
+import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class BookingService {
     BookingRepository bookingRepository;
     public final
     BookingConvert converter;
+    public final RoomRepository roomRepository;
 
     public List<BookingDTO> listAll(){
 
@@ -38,11 +41,18 @@ public class BookingService {
     }
 
 
-    public BookingDTO save(BookingDTO bookingDTO){
+    public BookingDTO save(BookingDTO bookingDTO) throws NotFoundException {
         bookingDTO.setBookingCode(UUID.randomUUID().toString());
         Booking booking=converter.dtoToEntity(bookingDTO);
-        booking=bookingRepository.save(booking);
-        return converter.entityToDto(booking);
+        Room room=roomRepository.checkAvailability(booking.getStartDate(),booking.getEndDate(),booking.getRoom().getId());
+        if(room!=null){
+            booking=bookingRepository.save(booking);
+            return converter.entityToDto(booking);
+        }
+        else {
+            throw new NotFoundException("Room already in use");
+        }
+
     }
 
     public List<BookingDTO> saveDepartments(List<BookingDTO> bookingDTOS){

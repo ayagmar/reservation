@@ -1,5 +1,5 @@
 package com.adservio.reservation.web;
-import com.adservio.reservation.entities.dto.BookingDTO;
+import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.BookingService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class BookingRestController {
         return service.getBookingByCode(code);
     }
     @PostMapping("/save")
-    public BookingDTO addBooking(@RequestBody BookingDTO bookingDTO){
+    public BookingDTO addBooking(@RequestBody BookingDTO bookingDTO) throws NotFoundException {
         return service.save(bookingDTO);
     }
 

@@ -1,9 +1,11 @@
 package com.adservio.reservation.web;
 
 
+import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
-import com.adservio.reservation.entities.dto.UserDTO;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.security.SecurityParams;
 import com.adservio.reservation.service.UserService;
@@ -21,10 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -60,6 +59,15 @@ public class UserRestController {
     public UserDTO updateUser(@PathVariable("id") Long id,
                               @RequestBody UserDTO user) {
         return service.updateUser(id,user);
+    }
+    @GetMapping("/reservations/{id}")
+    public Collection<BookingDTO> GetReservations(@PathVariable Long id) throws NotFoundException {
+        return service.GetReservations(id);
+    }
+
+    @GetMapping("/reservation/{id}")
+    public Collection<Booking> fetchReservations(@PathVariable Long id) {
+        return service.FetchReservation(id);
     }
 
 

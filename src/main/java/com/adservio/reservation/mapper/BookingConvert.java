@@ -1,9 +1,11 @@
 package com.adservio.reservation.mapper;
 
 import com.adservio.reservation.entities.Booking;
-import com.adservio.reservation.entities.dto.BookingDTO;
+import com.adservio.reservation.dto.BookingDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,10 +24,14 @@ public class BookingConvert {
 
     }
 
+    public Collection<BookingDTO> entityToDto(Collection<Booking> list) {
+        return  list.stream().map(this::entityToDto).collect(Collectors.toList());
+
+    }
+
 
     public Booking dtoToEntity(BookingDTO dto)
     {
-
 
         ModelMapper mapper = new ModelMapper();
 
@@ -37,6 +43,7 @@ public class BookingConvert {
 
         return dto.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
+
 
 }
 

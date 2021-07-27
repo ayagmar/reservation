@@ -1,7 +1,7 @@
 package com.adservio.reservation.mapper;
 
 import com.adservio.reservation.entities.User;
-import com.adservio.reservation.entities.dto.UserDTO;
+import com.adservio.reservation.dto.UserDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 

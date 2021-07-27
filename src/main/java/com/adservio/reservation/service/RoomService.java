@@ -2,7 +2,7 @@ package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.entities.Room;
-import com.adservio.reservation.entities.dto.RoomDTO;
+import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.RoomConvert;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,17 @@
 package com.adservio.reservation.service;
 
+import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoleRepository;
 import com.adservio.reservation.dao.UserRepository;
+import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
-import com.adservio.reservation.entities.dto.UserDTO;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
+import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.UserConvert;
+import com.adservio.reservation.security.SecurityParams;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,23 +29,25 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private final RoleRepository roleRepository;
-    private final UserConvert converter;
+    private final UserConvert userconverter;
+    private final BookingConvert bookingConvert;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     public List<UserDTO> listAll(){
-        return converter.entityToDto(userRepository.findAll());
+        return userconverter.entityToDto(userRepository.findAll());
     }
 
     public UserDTO getById(Long id) throws NotFoundException{
         Optional<User> user=userRepository.findById(id);
         if(user.isEmpty()) throw new NotFoundException("User Not Available");
-        return converter.entityToDto(user.get());
+        return userconverter.entityToDto(user.get());
     }
 
     public UserDTO GetUserByEmail(String email) {
-        return converter.entityToDto(userRepository.findByEmail(email));
+        return userconverter.entityToDto(userRepository.findByEmail(email));
     }
 
     public User GetUserByUsername(String username) {
@@ -50,17 +57,17 @@ public class UserService implements UserDetailsService {
 
 
     public UserDTO save(UserDTO userDTO){
-        User user=converter.dtoToEntity(userDTO);
-        user.getRoles().add(roleRepository.findByRoleName("USER"));
+        User user= userconverter.dtoToEntity(userDTO);
+        user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user=userRepository.save(user);
-        return converter.entityToDto(user);
+        return userconverter.entityToDto(user);
     }
 
     public List<UserDTO> saveUsers(List<UserDTO> userDTOS){
-        List<User> users=converter.dtoToEntity(userDTOS);
+        List<User> users= userconverter.dtoToEntity(userDTOS);
         users=userRepository.saveAll(users);
-        return converter.entityToDto(users);
+        return userconverter.entityToDto(users);
 
     }
 
@@ -85,7 +92,20 @@ public class UserService implements UserDetailsService {
         userDB.setFirstName(userDTO.getFirstName());
         userDB.setLastName(userDTO.getLastName());
         userRepository.save(userDB);
-        return converter.entityToDto(userDB);
+        return userconverter.entityToDto(userDB);
+    }
+
+    public Collection<BookingDTO> GetReservations(Long id) throws NotFoundException {
+       UserDTO userDTO=getById(id);
+       User user= userconverter.dtoToEntity(userDTO);
+        Collection<Booking> list=user.getReservation();
+        return bookingConvert.entityToDto(list);
+    }
+
+    public Collection<Booking> FetchReservation(Long id) {
+        User user=userRepository.getById(id);
+        Collection<Booking> list=user.getReservation();
+        return list;
     }
 
 
@@ -94,6 +114,8 @@ public class UserService implements UserDetailsService {
         Role appRole = roleRepository.findByRoleName(rolename);
         appUser.getRoles().add(appRole);
     }
+
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

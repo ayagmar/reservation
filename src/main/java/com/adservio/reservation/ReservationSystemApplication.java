@@ -3,6 +3,7 @@ package com.adservio.reservation;
 import com.adservio.reservation.service.IReservationInitService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +19,11 @@ public class ReservationSystemApplication implements CommandLineRunner {
 
     @Bean
     public ModelMapper modelMapper(){
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+        return modelMapper;
     }
     @Bean
     BCryptPasswordEncoder getBCryptPasswordEncoder() {

@@ -2,7 +2,7 @@ package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.DepartmentRepository;
 import com.adservio.reservation.entities.Department;
-import com.adservio.reservation.entities.dto.DepartmentDTO;
+import com.adservio.reservation.dto.DepartmentDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.DepartmentConvert;
 

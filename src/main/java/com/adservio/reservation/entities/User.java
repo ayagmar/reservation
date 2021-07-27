@@ -1,5 +1,6 @@
 package com.adservio.reservation.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
@@ -27,9 +28,7 @@ public class User implements Serializable {
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Collection<Role> roles = new ArrayList<>();
-
-    @ManyToMany(cascade = CascadeType.ALL)
-
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private Collection<Booking> reservation=new ArrayList<>();
 
 

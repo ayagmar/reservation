@@ -1,4 +1,4 @@
-package com.adservio.reservation.entities.dto;
+package com.adservio.reservation.dto;
 
 
 
