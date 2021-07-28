@@ -1,14 +1,17 @@
 package com.adservio.reservation.web;
 import com.adservio.reservation.dto.RoomDTO;
+import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.List;
 @RequiredArgsConstructor
 @RestController
@@ -32,6 +35,24 @@ public class RoomRestController {
     public ResponseEntity<RoomDTO> findRoomByName(@PathVariable String name) throws NotFoundException {
         return ResponseEntity.ok().body(service.getRoomByName(name));
     }
+
+//    @GetMapping("/available/{dates}/{datee}")
+//    public ResponseEntity<List<RoomDTO>> CheckAvailability(@PathVariable String dates,@PathVariable String datee) {
+//        return ResponseEntity.ok().body(service.FindAvailable(dates,datee));
+//    }
+@GetMapping("/available")
+public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
+                                                 @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
+                                                 LocalDateTime dateS,
+                                                 @RequestParam("dateEnd")
+                                                 @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
+                                                    LocalDateTime dateE){
+        return ResponseEntity.ok().body(service.FindAvailable(dateS, dateE));
+}
+
+
+
+
 
     @PostMapping("/save")
     public ResponseEntity<RoomDTO> addRoom(@RequestBody RoomDTO roomdto) throws URISyntaxException {

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,6 +56,10 @@ public class RoomService {
         return converter.entityToDto(room);
     }
 
+    public List<RoomDTO>FindAvailable(LocalDateTime datestart,LocalDateTime dateend){
+        List<Room> availrooms=roomRepository.findMeetingRoomAvailable(datestart,dateend);
+        return converter.entityToDto(availrooms);
+    }
 
     public void deleteRoom(Long id) {
         roomRepository.deleteById(id);

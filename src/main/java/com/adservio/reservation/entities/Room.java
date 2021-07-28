@@ -15,11 +15,12 @@ public class Room implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
     @Column(nullable = false)
+    private String name;
+    @JsonIgnore
     @OneToMany(mappedBy = "room",cascade = CascadeType.ALL)
     private Collection<Booking> reservation;
-
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Department department;
 
