@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 @RequiredArgsConstructor
 @RestController
@@ -36,7 +37,7 @@ public class BookingRestController {
         return service.getBookingByCode(code);
     }
     @PostMapping("/save")
-    public BookingDTO addBooking(@RequestBody BookingDTO bookingDTO) throws NotFoundException {
+    public BookingDTO addBooking(@RequestBody @Valid BookingDTO bookingDTO) throws NotFoundException {
         return service.save(bookingDTO);
     }
 

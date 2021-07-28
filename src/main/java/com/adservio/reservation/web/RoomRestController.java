@@ -75,7 +75,7 @@ public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
     public ResponseEntity<RoomDTO> updateRoom(@PathVariable("id") Long id,
                                           @RequestBody RoomDTO room) {
         RoomDTO result = service.updateRoom(id,room);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/update/{id}").toUriString());
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
         return  ResponseEntity.created(uri).body(result);
     }
 

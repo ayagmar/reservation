@@ -18,9 +18,7 @@ public class BookingDTO {
     LocalDateTime EndDate;
     private String description;
     private String code;
-    @JsonIgnore
     private RoomDTO room;
-    @JsonIgnore
     private UserDTO user;
 
 }

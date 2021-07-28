@@ -25,10 +25,12 @@ public class Booking implements Serializable {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinTable( name = "users_reservations",
+    joinColumns = @JoinColumn(name = "booking_id"),
+    inverseJoinColumns = @JoinColumn(name = "user_id"))
     private User user;
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;

@@ -2,6 +2,7 @@ package com.adservio.reservation.web;
 
 
 import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
@@ -16,13 +17,16 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,34 +39,39 @@ public class UserRestController {
     private final UserService service;
 
     @GetMapping("/all")
-    public List<UserDTO> findAllUsers(){
-        return service.listAll();
+    public ResponseEntity<List<UserDTO>> findAllUsers(){
+        return ResponseEntity.ok().body(service.listAll());
     }
     @GetMapping("/{id}")
-    public UserDTO findUserById(@PathVariable Long id) throws NotFoundException {
-        return service.getById(id);
+    public ResponseEntity<UserDTO> findUserById(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.getById(id));
     }
     @GetMapping("/{id}/reservations")
-    public Collection<BookingDTO> GetReservations(@PathVariable Long id) throws NotFoundException {
-        return service.GetReservations(id);
+    public ResponseEntity<Collection<BookingDTO>> GetReservations(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.GetReservations(id));
     }
     @GetMapping("/findEMAIL/{email}")
-    public UserDTO findUserByEmail(@PathVariable String email) {
-        return service.GetUserByEmail(email);
+    public ResponseEntity<UserDTO> findUserByEmail(@PathVariable String email) {
+        return ResponseEntity.ok().body(service.GetUserByEmail(email));
     }
     @PostMapping("/save")
-    public UserDTO addUser(@Valid @RequestBody UserDTO userDTO){
-        return service.save(userDTO);
-    }
+    public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO userDTO){
+        UserDTO result =service.save(userDTO);
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
+        return  ResponseEntity.created(uri).body(result);    }
+
     @PostMapping("/save/all")
-    public List<UserDTO> addUsers(@RequestBody List<UserDTO> userDTOS){
-        return service.saveUsers(userDTOS);
+    public ResponseEntity<List<UserDTO>> addUsers(@RequestBody List<UserDTO> userDTOS){
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save/all").toUriString());
+        return  ResponseEntity.created(uri).body(service.saveUsers(userDTOS));
     }
 
     @PutMapping("/{id}/update")
-    public UserDTO updateUser(@PathVariable("id") Long id,
+    public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                               @RequestBody UserDTO user) {
-        return service.updateUser(id,user);
+        UserDTO result = service.updateUser(id,user);
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
+        return  ResponseEntity.created(uri).body(result);
     }
 
 

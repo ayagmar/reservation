@@ -64,7 +64,7 @@ public class DepartmentRestController {
                                        @RequestBody DepartmentDTO department)  throws URISyntaxException{
 
         DepartmentDTO result = service.updateDepartment(departmentId,department);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/update/{id}").toUriString());
+        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/{id}/{update}").toUriString());
         return  ResponseEntity.created(uri).body(result);
     }
 

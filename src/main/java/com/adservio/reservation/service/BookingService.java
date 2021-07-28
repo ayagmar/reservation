@@ -44,13 +44,12 @@ public class BookingService {
     }
     public UserDTO GetUserByBookingId(Long id) throws NotFoundException {
         BookingDTO bookingDTO=getById(id);
-        UserDTO user=bookingDTO.getUser();
-        return user;
+        return bookingDTO.getUser();
     }
 
     public BookingDTO save(BookingDTO bookingDTO) throws NotFoundException {
-        bookingDTO.setCode(UUID.randomUUID().toString());
         Booking booking=converter.dtoToEntity(bookingDTO);
+        booking.setCode(UUID.randomUUID().toString());
         Room room=roomRepository.checkAvailability(booking.getStartDate(),booking.getEndDate(),booking.getRoom().getId());
         if(room!=null){
             booking=bookingRepository.save(booking);
