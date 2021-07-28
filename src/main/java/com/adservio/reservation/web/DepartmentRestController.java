@@ -1,6 +1,7 @@
 package com.adservio.reservation.web;
 
 import com.adservio.reservation.dto.DepartmentDTO;
+import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -28,10 +30,16 @@ public class DepartmentRestController {
         return ResponseEntity.ok().body(service.listAll());
     }
 
-    @GetMapping("/findID/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<DepartmentDTO> findDepartmentById(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.getById(id));
     }
+
+    @GetMapping("/{id}/rooms")
+    public ResponseEntity<Collection<RoomDTO>> FetchRoomsByIdDepartment(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.ListRoomByDepartmentID(id));
+    }
+
 
     @GetMapping("/findNAME/{name}")
     public ResponseEntity<DepartmentDTO> findDepartmentByName(@PathVariable String name) throws NotFoundException {
@@ -51,7 +59,7 @@ public class DepartmentRestController {
         return ResponseEntity.created(uri).body(service.saveDepartments(departmentDTOS));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}/update")
     public ResponseEntity<DepartmentDTO> updateDepartment(@PathVariable("id") Long departmentId,
                                        @RequestBody DepartmentDTO department)  throws URISyntaxException{
 
@@ -60,7 +68,7 @@ public class DepartmentRestController {
         return  ResponseEntity.created(uri).body(result);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}/delete")
     public String deleteDepartment(@PathVariable Long id) {
         return service.deleteDepartment(id);
     }

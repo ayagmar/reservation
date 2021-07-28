@@ -1,8 +1,10 @@
 package com.adservio.reservation.web;
 import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +22,13 @@ public class BookingRestController {
         return service.listAll();
     }
 
-    @GetMapping("/findID/{id}")
+    @GetMapping("/{id}")
     public BookingDTO findBookingById(@PathVariable Long id) throws NotFoundException {
         return service.getById(id);
+    }
+    @GetMapping("/{id}/user")
+    public ResponseEntity <UserDTO> GetUserByBookId(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.GetUserByBookingId(id));
     }
 
     @GetMapping("/findCODE/{code}")
@@ -39,7 +45,7 @@ public class BookingRestController {
         return service.saveDepartments(bookingDTOS);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}/update")
     public String deleteBooking(@PathVariable Long id) {
         return service.deleteBooking(id);
     }

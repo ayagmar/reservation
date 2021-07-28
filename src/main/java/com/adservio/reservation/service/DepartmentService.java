@@ -1,15 +1,20 @@
 package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.DepartmentRepository;
+import com.adservio.reservation.dao.RoomRepository;
+import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.entities.Department;
 import com.adservio.reservation.dto.DepartmentDTO;
+import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.DepartmentConvert;
 
+import com.adservio.reservation.mapper.RoomConvert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,10 +23,12 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class DepartmentService {
-    public final
+    private final
     DepartmentRepository departmentRepository;
-    public final
+    private final
     DepartmentConvert converter;
+    private final RoomConvert roomConvert;
+    private final RoomRepository roomRepository;
 
 
 
@@ -37,6 +44,12 @@ public class DepartmentService {
         return converter.entityToDto(department.get());
     }
 
+    public Collection<RoomDTO> ListRoomByDepartmentID(Long id) throws NotFoundException {
+        DepartmentDTO departmentDTO=getById(id);
+        Department department=converter.dtoToEntity(departmentDTO);
+        Collection<Room> rooms=department.getRoom();
+        return roomConvert.entityToDto(rooms);
+    }
 
     public DepartmentDTO GetDepartmentByName(String name) throws NotFoundException {
         if(name.isEmpty()) throw new NotFoundException("Insert a name to find department");

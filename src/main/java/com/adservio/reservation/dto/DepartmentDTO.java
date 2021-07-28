@@ -9,5 +9,5 @@ public class DepartmentDTO {
     private Long id;
     private String name;
     @JsonIgnore
-    private Collection<RoomDTO> rooms;
+    private Collection<RoomDTO> room;
 }

@@ -2,6 +2,8 @@ package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoomRepository;
+import com.adservio.reservation.dao.UserRepository;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.dto.BookingDTO;
@@ -24,6 +26,7 @@ public class BookingService {
     public final
     BookingConvert converter;
     public final RoomRepository roomRepository;
+    private final UserRepository userRepository;
 
     public List<BookingDTO> listAll(){
 
@@ -39,7 +42,11 @@ public class BookingService {
     public BookingDTO getBookingByCode(String code) {
         return converter.entityToDto(bookingRepository.findByCode(code));
     }
-
+    public UserDTO GetUserByBookingId(Long id) throws NotFoundException {
+        BookingDTO bookingDTO=getById(id);
+        UserDTO user=bookingDTO.getUser();
+        return user;
+    }
 
     public BookingDTO save(BookingDTO bookingDTO) throws NotFoundException {
         bookingDTO.setCode(UUID.randomUUID().toString());

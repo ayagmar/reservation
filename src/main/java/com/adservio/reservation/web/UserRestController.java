@@ -38,9 +38,13 @@ public class UserRestController {
     public List<UserDTO> findAllUsers(){
         return service.listAll();
     }
-    @GetMapping("/findID/{id}")
+    @GetMapping("/{id}")
     public UserDTO findUserById(@PathVariable Long id) throws NotFoundException {
         return service.getById(id);
+    }
+    @GetMapping("/{id}/reservations")
+    public Collection<BookingDTO> GetReservations(@PathVariable Long id) throws NotFoundException {
+        return service.GetReservations(id);
     }
     @GetMapping("/findEMAIL/{email}")
     public UserDTO findUserByEmail(@PathVariable String email) {
@@ -55,19 +59,16 @@ public class UserRestController {
         return service.saveUsers(userDTOS);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}/update")
     public UserDTO updateUser(@PathVariable("id") Long id,
                               @RequestBody UserDTO user) {
         return service.updateUser(id,user);
     }
-    @GetMapping("/reservations/{id}")
-    public Collection<BookingDTO> GetReservations(@PathVariable Long id) throws NotFoundException {
-        return service.GetReservations(id);
-    }
 
 
 
-    @DeleteMapping("/delete/{id}")
+
+    @DeleteMapping("/{id}/delete")
     public String deleteUser(@PathVariable Long id) {
          service.deleteUser(id);
          return "Delete successfully";

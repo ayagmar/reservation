@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -19,7 +20,7 @@ public class Room implements Serializable {
     private String name;
     @JsonIgnore
     @OneToMany(mappedBy = "room",cascade = CascadeType.ALL)
-    private Collection<Booking> reservation;
+    private Collection<Booking> bookings =new ArrayList<>();
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Department department;

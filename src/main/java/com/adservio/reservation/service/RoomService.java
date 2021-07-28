@@ -1,15 +1,19 @@
 package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.RoomRepository;
+import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.exception.NotFoundException;
+import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.RoomConvert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +26,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
 
     private final RoomConvert converter;
+    private final BookingConvert bookingConvert;
 
 
     public List<RoomDTO> listAll() {
@@ -59,6 +64,13 @@ public class RoomService {
     public List<RoomDTO>FindAvailable(LocalDateTime datestart,LocalDateTime dateend){
         List<Room> availrooms=roomRepository.findMeetingRoomAvailable(datestart,dateend);
         return converter.entityToDto(availrooms);
+    }
+
+    public Collection<BookingDTO> listBookByRoom(Long roomid) throws NotFoundException {
+        RoomDTO roomDTO=getById(roomid);
+        Room room=converter.dtoToEntity(roomDTO);
+        Collection<Booking> list=room.getBookings();
+        return bookingConvert.entityToDto(list);
     }
 
     public void deleteRoom(Long id) {

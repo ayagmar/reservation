@@ -1,4 +1,5 @@
 package com.adservio.reservation.web;
+import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.exception.NotFoundException;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 @RequiredArgsConstructor
 @RestController
@@ -26,13 +28,13 @@ public class RoomRestController {
         return ResponseEntity.ok().body(service.listAll());
     }
 
-    @GetMapping("/findID/{id}")
+    @GetMapping("/{id}")
     public  ResponseEntity<RoomDTO> findRoomById(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.getById(id));
     }
 
-    @GetMapping("/findNAME/{name}")
-    public ResponseEntity<RoomDTO> findRoomByName(@PathVariable String name) throws NotFoundException {
+    @GetMapping("/findname")
+    public ResponseEntity<RoomDTO> findRoomByName(@RequestParam("name") String name) throws NotFoundException {
         return ResponseEntity.ok().body(service.getRoomByName(name));
     }
 
@@ -50,9 +52,10 @@ public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
         return ResponseEntity.ok().body(service.FindAvailable(dateS, dateE));
 }
 
-
-
-
+    @GetMapping("/{id}/bookings")
+    public ResponseEntity<Collection<BookingDTO>> updateRoom(@PathVariable("id") Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.listBookByRoom(id));
+    }
 
     @PostMapping("/save")
     public ResponseEntity<RoomDTO> addRoom(@RequestBody RoomDTO roomdto) throws URISyntaxException {
@@ -68,7 +71,7 @@ public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
         return  ResponseEntity.created(uri).body(service.saveRooms(rooms));
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}/update")
     public ResponseEntity<RoomDTO> updateRoom(@PathVariable("id") Long id,
                                           @RequestBody RoomDTO room) {
         RoomDTO result = service.updateRoom(id,room);
@@ -76,7 +79,7 @@ public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
         return  ResponseEntity.created(uri).body(result);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}/delete")
     public String deleteRoom(@PathVariable Long id) {
         service.deleteRoom(id);
         return "Deleted successfully";
