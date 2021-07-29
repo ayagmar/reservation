@@ -62,6 +62,9 @@ public class RoomService {
     }
 
     public List<RoomDTO>FindAvailable(LocalDateTime datestart,LocalDateTime dateend){
+        if(dateend==null){
+            dateend=datestart.plusMonths(1);
+        }
         List<Room> availrooms=roomRepository.findMeetingRoomAvailable(datestart,dateend);
         return converter.entityToDto(availrooms);
     }

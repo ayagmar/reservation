@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 @RequiredArgsConstructor
 @RestController
@@ -39,6 +40,10 @@ public class BookingRestController {
     @PostMapping("/save")
     public BookingDTO addBooking(@RequestBody @Valid BookingDTO bookingDTO) throws NotFoundException {
         return service.save(bookingDTO);
+    }
+    @GetMapping("/all/room/{name}")
+    public Collection<BookingDTO> FetchBookingsByRoomName(@PathVariable String name){
+        return service.GetAllByRoomName(name);
     }
 
     @PostMapping("/save/all")

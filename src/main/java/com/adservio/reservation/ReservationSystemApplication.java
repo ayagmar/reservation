@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ public class ReservationSystemApplication implements CommandLineRunner {
 
     private final IReservationInitService reservationInitService;
     private BookingRepository bookingRepository;
+
 
     @Bean
     public ModelMapper modelMapper(){
@@ -32,6 +35,12 @@ public class ReservationSystemApplication implements CommandLineRunner {
     BCryptPasswordEncoder getBCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+ RestTemplate getRestTemplate(){
+        return new RestTemplate();
+ }
+
 
 
 

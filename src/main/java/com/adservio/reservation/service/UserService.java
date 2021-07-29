@@ -13,6 +13,7 @@ import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.RoleConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
+import com.adservio.reservation.web.UserRestController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -38,6 +40,7 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
+
     public List<UserDTO> listAll(){
         return userconverter.entityToDto(userRepository.findAll());
     }
@@ -53,13 +56,12 @@ public class UserService implements UserDetailsService {
     }
 
     public User GetUserByUsername(String username) {
-       return userRepository.findByEmail(username);
+       return userRepository.findByUsername(username);
     }
 
 
 
     public UserDTO save(UserDTO userDTO){
-       // userDTO.setRole(roleConvert.entityToDto(roleRepository.findByRoleName(SecurityParams.USER)));
         User user= userconverter.dtoToEntity(userDTO);
         user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));

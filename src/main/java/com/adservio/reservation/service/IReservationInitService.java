@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.stream.Stream;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -21,19 +23,21 @@ public class IReservationInitService {
     private final DepartmentRepository departmentRepository;
     private final RoleRepository roleRepository;
 
+
     public void initRooms() {
-        Room r =new Room();
-        Room s =new Room();
-        Room q=new Room();
-        r.setName("Room01");
-        r.setDepartment(departmentRepository.findByName("Info"));
-        roomRepository.save(r);
-        s.setName("Room02");
-        s.setDepartment(departmentRepository.findByName("Info"));
-        roomRepository.save(s);
-        q.setName("Room03");
-        q.setDepartment(departmentRepository.findByName("Finance"));
-        roomRepository.save(q);
+
+        Room r3=new Room();
+            Stream.of("Room01","Room02","Room03","Room04","Room05","Room06","Room07","Room08")
+                    .forEach(roomName->{
+                        Room room=new Room();
+                        room.setName(roomName);
+                        room.setDepartment(departmentRepository.findByName("Info"));
+                        roomRepository.save(room);
+                    });
+
+        r3.setName("Room09");
+        r3.setDepartment(departmentRepository.findByName("Finance"));
+        roomRepository.save(r3);
     }
 
 
@@ -47,6 +51,7 @@ public class IReservationInitService {
         u.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u.setLastName("Depp");
         u.getRoles().add(roleRepository.findByRoleName(SecurityParams.ADMIN));
+        u.getRoles().add(roleRepository.findByRoleName(SecurityParams.USER));
         u.setActive(true);
         //-----//
         u2.setEmail("User2Email@gmail.com");
@@ -73,9 +78,8 @@ public class IReservationInitService {
 
     public void initReservation() throws ParseException {
 
-        String DateStart = "2021-07-23T08:00:00";
-        String DateEnd = "2021-07-23T10:00:00";
-
+        String DateStart = "2021-07-29T08:00:00";
+        String DateEnd = "2021-07-29T10:00:00";
         LocalDateTime dateS =LocalDateTime.parse(DateStart);
         LocalDateTime dateE =LocalDateTime.parse(DateEnd);
         Booking b=new Booking();
@@ -88,8 +92,8 @@ public class IReservationInitService {
         b.setEndDate(dateE);
         b.setCode(UUID.randomUUID().toString());
         //----//
-        String DateStart2 = "2021-07-25T02:15:55";
-        String DateEnd2 = "2021-07-25T05:15:55";
+        String DateStart2 = "2021-07-30T14:00:00";
+        String DateEnd2 = "2021-07-30T15:00:00";
 
         LocalDateTime dateS2 =LocalDateTime.parse(DateStart2);
         LocalDateTime dateE2 =LocalDateTime.parse(DateEnd2);
@@ -100,8 +104,8 @@ public class IReservationInitService {
         b2.setStartDate(dateS2);
         b2.setEndDate(dateE2);
         //----//
-        String DateStart3 = "2021-07-29T02:15:55";
-        String DateEnd3 = "2021-07-29T05:15:55";
+        String DateStart3 = "2021-07-29T10:00:00";
+        String DateEnd3 = "2021-07-29T13:00:00";
         LocalDateTime dateS3 =LocalDateTime.parse(DateStart3);
         LocalDateTime dateE3 =LocalDateTime.parse(DateEnd3);
         b3.setDescription("BookingTest3");

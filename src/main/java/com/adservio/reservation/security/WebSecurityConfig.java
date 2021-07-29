@@ -24,15 +24,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //            JWTAuthenticationFilter jwtAuthenticationFilter=new JWTAuthenticationFilter(authenticationManager());
 //            jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
-        http.csrf().disable().
-                authorizeRequests().anyRequest().permitAll();
+        http.csrf().disable();
+        http.authorizeRequests().anyRequest().permitAll();
 //        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //       http.authorizeRequests().antMatchers("/api/login/**", "/api/register/**").permitAll();
-//      http.authorizeRequests().antMatchers("/api/**/save/**", "/api/**/edit/**","/api/delete/**","/api/**/all","/api/Find**/**").hasAuthority("ADMIN");
+//      http.authorizeRequests().antMatchers("/api/**/save/**", "/api/**/**/update","/api/**/**/delete","/api/**/all").hasAuthority(SecurityParams.ADMIN);
 //      http.authorizeRequests().anyRequest().authenticated();
 //      http.addFilter(jwtAuthenticationFilter);
 //      http.addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+        //
 
 
     }
