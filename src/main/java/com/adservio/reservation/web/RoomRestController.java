@@ -1,6 +1,7 @@
 package com.adservio.reservation.web;
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.RoomDTO;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoomService;
@@ -47,15 +48,23 @@ public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
                                                  @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
                                                  LocalDateTime dateS,
                                                  @RequestParam("dateEnd")
-                                                 @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
-                                                    LocalDateTime dateE){
+                                                 @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateE){
         return ResponseEntity.ok().body(service.FindAvailable(dateS, dateE));
 }
 
     @GetMapping("/{id}/bookings")
-    public ResponseEntity<Collection<BookingDTO>> updateRoom(@PathVariable("id") Long id) throws NotFoundException {
+    public ResponseEntity<Collection<BookingDTO>> GetBookingsByRoom(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.listBookByRoom(id));
     }
+    @GetMapping("/booking/latest")
+    public ResponseEntity<RoomDTO> FetchLatestReservedRoom() throws NotFoundException {
+        return ResponseEntity.ok().body(service.GetLastReservedRoom());
+    }
+    @GetMapping("/{id}/users")
+    public ResponseEntity<Collection<UserDTO>> GetUsersByRoom(@PathVariable("id") Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.GetUsersByRoom(id));
+    }
+
 
     @PostMapping("/save")
     public ResponseEntity<RoomDTO> addRoom(@RequestBody RoomDTO roomdto) throws URISyntaxException {
@@ -78,6 +87,7 @@ public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
         URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
         return  ResponseEntity.created(uri).body(result);
     }
+
 
     @DeleteMapping("/{id}/delete")
     public String deleteRoom(@PathVariable Long id) {

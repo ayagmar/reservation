@@ -1,12 +1,17 @@
 package com.adservio.reservation.web;
 
 
+import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
+import com.adservio.reservation.mapper.BookingConvert;
+import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
+import com.adservio.reservation.service.BookingService;
 import com.adservio.reservation.service.EmailSenderService;
 import com.adservio.reservation.service.UserService;
 import com.auth0.jwt.JWT;
@@ -16,7 +21,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -33,8 +40,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Path;
 import javax.validation.Valid;
+import java.awt.print.Book;
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,9 +53,12 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RestController
 @RequestMapping("/api/user")
 public class UserRestController {
-    private final UserService service;
     @Autowired
-    private EmailSenderService emailSenderService;
+    private final UserService service;
+    private final EmailSenderService emailSenderService;
+    private final BookingService bookingService;
+
+    private final UserConvert userConvert;
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> findAllUsers(){
@@ -56,13 +68,29 @@ public class UserRestController {
     public ResponseEntity<UserDTO> findUserById(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.getById(id));
     }
-    @GetMapping("/{id}/reservations")
-    public ResponseEntity<Collection<BookingDTO>> GetReservations(@PathVariable Long id) throws NotFoundException {
-        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-       // User user= service.GetUserByUsername(auth.getPrincipal().toString());
-
-        return ResponseEntity.ok().body(service.GetReservations(id));
+    @GetMapping("/reservations")
+    public ResponseEntity<Collection<BookingDTO>> GetReservations() throws NotFoundException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User LoggedInUser= service.GetUserByUsername(auth.getPrincipal().toString());
+        return ResponseEntity.ok().body(service.GetReservations(LoggedInUser.getId()));
     }
+    @PostMapping("/book/{roomName}")
+    public String BookARoom(@PathVariable String roomName,
+                            @RequestParam String dateStart,
+                            @RequestParam String dateEnd,@RequestBody String description) throws NotFoundException {
+        LocalDateTime dateS =LocalDateTime.parse(dateStart);
+        LocalDateTime dateE =LocalDateTime.parse(dateEnd);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User LoggedInUser= service.GetUserByUsername(auth.getPrincipal().toString());
+        UserDTO userDTO=userConvert.entityToDto(LoggedInUser);
+        BookingDTO booking= service.bookRoom(roomName,dateS,dateE);
+        booking.setUser(userDTO);
+        booking.setDescription(description);
+        bookingService.save(booking);
+        return "successfully added booking";
+    }
+
     @GetMapping("/findEMAIL/{email}")
     public ResponseEntity<UserDTO> findUserByEmail(@PathVariable String email) {
         return ResponseEntity.ok().body(service.GetUserByEmail(email));
@@ -93,14 +121,13 @@ UserDTO user=service.getById(id);
         emailSenderService.SendEmail(user.getEmail(),"teestt","Booking Reservation ");
     } catch (MailException mailException) {
         System.out.println(mailException);
-
     }
     return "Congratulations! Your mail has been send to the user.";
 }
 
-@GetMapping("/admin/booking/confirm")
-    public boolean ConfirmedReservation(){
-        return false;
+@RequestMapping("/admin/booking/confirm/{confirmed}")
+    public boolean ConfirmedReservation(@PathVariable boolean confirmed){
+        return confirmed;
     }
 
 

@@ -1,22 +1,25 @@
 package com.adservio.reservation.service;
 
+import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.dto.RoomDTO;
+import com.adservio.reservation.entities.User;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.RoomConvert;
+import com.adservio.reservation.mapper.UserConvert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.print.Book;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -24,9 +27,11 @@ import java.util.Optional;
 public class RoomService {
 
     private final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository;
 
     private final RoomConvert converter;
     private final BookingConvert bookingConvert;
+    private final UserConvert userConvert;
 
 
     public List<RoomDTO> listAll() {
@@ -48,7 +53,16 @@ public class RoomService {
 
     }
 
-
+    public Collection<UserDTO> GetUsersByRoom(Long roomid) throws NotFoundException {
+        RoomDTO roomDTO = getById(roomid);
+        Room room = converter.dtoToEntity(roomDTO);
+        Collection<Booking> bookings = room.getBookings();
+        List<User> users = new ArrayList<>();
+        for (Booking booking : bookings) {
+            users.add(booking.getUser());
+        }
+        return userConvert.entityToDto(users);
+    }
     public RoomDTO getRoomByName(String name) throws NotFoundException {
         if(name.isEmpty()) throw new NotFoundException("Insert a name to find room");
         if(roomRepository.findByName(name)==null) throw new NotFoundException("Room not found");
@@ -74,6 +88,15 @@ public class RoomService {
         Room room=converter.dtoToEntity(roomDTO);
         Collection<Booking> list=room.getBookings();
         return bookingConvert.entityToDto(list);
+    }
+
+
+
+
+    public RoomDTO GetLastReservedRoom(){
+        List<Booking> bookings =bookingRepository.findAll();
+        Booking latest =bookings.get(bookings.size()-1);
+        return converter.entityToDto(latest.getRoom());
     }
 
     public void deleteRoom(Long id) {

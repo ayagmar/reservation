@@ -1,7 +1,7 @@
 package com.adservio.reservation.service;
 
-import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoleRepository;
+import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.entities.Booking;
@@ -10,10 +10,9 @@ import com.adservio.reservation.entities.User;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
-import com.adservio.reservation.mapper.RoleConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
-import com.adservio.reservation.web.UserRestController;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,21 +21,22 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final BookingRepository bookingRepository;
+    private final RoomRepository roomRepository;
     private final RoleRepository roleRepository;
     private final UserConvert userconverter;
     private final BookingConvert bookingConvert;
-    private final RoleConvert roleConvert;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
@@ -58,6 +58,7 @@ public class UserService implements UserDetailsService {
     public User GetUserByUsername(String username) {
        return userRepository.findByUsername(username);
     }
+
 
 
 
@@ -107,6 +108,14 @@ public class UserService implements UserDetailsService {
         return bookingConvert.entityToDto(list);
     }
 
+    public BookingDTO bookRoom(String Name, LocalDateTime Start,LocalDateTime End){
+        Booking booking=new Booking();
+        booking.setRoom(roomRepository.findByName(Name));
+        booking.setStartDate(Start);
+        booking.setEndDate(End);
+        booking.setCode(UUID.randomUUID().toString());
+        return bookingConvert.entityToDto(booking);
+    }
 
 
     public void addRoleToUser(String username, String rolename) {
@@ -123,10 +132,7 @@ public class UserService implements UserDetailsService {
         if (user==null){
             throw new UsernameNotFoundException("Username not found in database");
         }
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles().forEach(role -> {
-            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
-        });
+        Collection<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
         return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(),authorities);
     }
 
