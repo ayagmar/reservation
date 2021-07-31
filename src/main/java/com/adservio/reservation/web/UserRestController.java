@@ -33,6 +33,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,6 +55,8 @@ public class UserRestController {
 
     private final BookingRepository bookingRepository;
 
+
+
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> findAllUsers() {
         return ResponseEntity.ok().body(service.listAll());
@@ -62,7 +67,7 @@ public class UserRestController {
         return ResponseEntity.ok().body(service.getById(id));
     }
 
-    @GetMapping("/reservations")
+    @GetMapping("/bookings")
     public ResponseEntity<Collection<BookingDTO>> GetReservations() throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
@@ -88,7 +93,7 @@ public class UserRestController {
         List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
         String Body = "User " + booking.getUser().getFirstName() + " has reserved room " + booking.getRoom().getName() + " with a duration of "
                 + ChronoUnit.HOURS.between(dateS, dateE) + " Hours"
-                + " From " + dateS + " To " + dateE;
+                + " On " + dateS.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"));
         for (User user : users) {
             try {
                 emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
@@ -136,13 +141,23 @@ public class UserRestController {
         }
 
         if (bookings.contains(booking)) {
-            System.out.println(bookings.contains(booking));
             bookingService.deleteBooking(booking.getId());
+            List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
+            String Body ="User "+auth.getPrincipal().toString()+" has cancelled the reservation "
+                    +booking.getCode()+
+                    " at "+LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"))+" regarding room : "+booking.getRoom().getName();
+            for (User user : users) {
+                try {
+                    emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
+                } catch (MailException mailException) {
+                    mailException.printStackTrace();
+                }
+            }
 
             return ResponseEntity.ok().body("DELETED SUCCESSFULLY");
-        } else
-            System.out.println("ERROR DELETING RESERVATION");
-        return ResponseEntity.status(405).body("Error deleting reservation that is not yours");
+        } else {
+            return ResponseEntity.status(405).body("Error deleting reservation that is not yours");
+        }
 
     }
 
@@ -155,21 +170,22 @@ public class UserRestController {
         return ResponseEntity.created(uri).body(result);
     }
 
-    @RequestMapping("/{id}/send")
-    public String sendmail(@PathVariable("id") Long id) throws NotFoundException {
-        UserDTO user = service.getById(id);
-        try {
-            emailSenderService.SendEmail(user.getEmail(), "teestt", "Booking Reservation ");
-        } catch (MailException mailException) {
-            mailException.printStackTrace();
-        }
-        return "Congratulations! Your mail has been send to the user.";
-    }
 
-    @RequestMapping("/admin/booking/confirm/{confirmed}")
-    public boolean ConfirmedReservation(@PathVariable boolean confirmed) {
-        return confirmed;
-    }
+//    @RequestMapping("/{id}/send")
+//    public String sendmail(@PathVariable("id") Long id) throws NotFoundException {
+//        UserDTO user = service.getById(id);
+//        try {
+//            emailSenderService.SendEmail(user.getEmail(), "teestt", "Booking Reservation ");
+//        } catch (MailException mailException) {
+//            mailException.printStackTrace();
+//        }
+//        return "Congratulations! Your mail has been send to the user.";
+//    }
+
+//    @RequestMapping("/admin/booking/confirm/{confirmed}")
+//    public boolean ConfirmedReservation(@PathVariable boolean confirmed) {
+//        return confirmed;
+//    }
 
 
     @DeleteMapping("/{id}/delete")

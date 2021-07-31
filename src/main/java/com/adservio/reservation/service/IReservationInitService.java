@@ -77,8 +77,8 @@ public class IReservationInitService {
 
     public void initReservation() throws ParseException {
 
-        String DateStart = "2021-07-29T08:00:00";
-        String DateEnd = "2021-07-29T10:00:00";
+        String DateStart = "2021-07-29T08:00";
+        String DateEnd = "2021-07-29T10:00";
         LocalDateTime dateS = LocalDateTime.parse(DateStart);
         LocalDateTime dateE = LocalDateTime.parse(DateEnd);
         Booking b = new Booking();
@@ -91,8 +91,8 @@ public class IReservationInitService {
         b.setEndDate(dateE);
         b.setCode(UUID.randomUUID().toString());
         //----//
-        String DateStart2 = "2021-07-30T14:00:00";
-        String DateEnd2 = "2021-07-30T15:00:00";
+        String DateStart2 = "2021-07-30T14:00";
+        String DateEnd2 = "2021-07-30T15:00";
 
         LocalDateTime dateS2 = LocalDateTime.parse(DateStart2);
         LocalDateTime dateE2 = LocalDateTime.parse(DateEnd2);
@@ -103,8 +103,8 @@ public class IReservationInitService {
         b2.setStartDate(dateS2);
         b2.setEndDate(dateE2);
         //----//
-        String DateStart3 = "2021-07-29T10:00:00";
-        String DateEnd3 = "2021-07-29T13:00:00";
+        String DateStart3 = "2021-07-29T10:00";
+        String DateEnd3 = "2021-07-29T13:00";
         LocalDateTime dateS3 = LocalDateTime.parse(DateStart3);
         LocalDateTime dateE3 = LocalDateTime.parse(DateEnd3);
         b3.setDescription("BookingTest3");
