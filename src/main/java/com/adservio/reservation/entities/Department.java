@@ -1,8 +1,8 @@
 package com.adservio.reservation.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -20,9 +20,9 @@ public class Department implements Serializable {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "department",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
 
-    private Collection<Room> room=new ArrayList<>();
+    private Collection<Room> room = new ArrayList<>();
 
 
 }

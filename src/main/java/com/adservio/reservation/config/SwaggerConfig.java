@@ -15,18 +15,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
 
     @Bean
-    public Docket api(){
-    return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-            .apis(RequestHandlerSelectors.basePackage("com.adservio.reservation"))
-            .paths(PathSelectors.any()).build();
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("com.adservio.reservation"))
+                .paths(PathSelectors.any()).build();
 
 
     }
 
-private ApiInfo apiInfo(){
-return new ApiInfoBuilder().title("Reservation API").description("API profile documentation").version("1.0").build();
-}
-
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder().title("Reservation API").description("API profile documentation").version("1.0").build();
+    }
 
 
 }

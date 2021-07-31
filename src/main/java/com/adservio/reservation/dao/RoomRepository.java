@@ -5,12 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
     Room findByName(String name);
+
     @Query(value = "select * from room as ro "
             + "where ro.id not in "
             + "("

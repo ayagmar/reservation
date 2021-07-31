@@ -1,7 +1,7 @@
 package com.adservio.reservation.mapper;
 
-import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.dto.RoleDTO;
+import com.adservio.reservation.entities.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -13,26 +13,25 @@ public class RoleConvert {
 
     public RoleDTO entityToDto(Role role) {
 
-        ModelMapper mapper =new ModelMapper();
+        ModelMapper mapper = new ModelMapper();
 
-        return mapper.map(role,RoleDTO.class);
+        return mapper.map(role, RoleDTO.class);
 
     }
+
     public List<RoleDTO> entityToDto(List<Role> roles) {
 
-        return	roles.stream().map(this::entityToDto).collect(Collectors.toList());
+        return roles.stream().map(this::entityToDto).collect(Collectors.toList());
 
     }
 
 
-    public Role dtoToEntity(RoleDTO dto)
-    {
+    public Role dtoToEntity(RoleDTO dto) {
         ModelMapper mapper = new ModelMapper();
-        return mapper.map(dto,Role.class);
+        return mapper.map(dto, Role.class);
     }
 
-    public List<Role> dtoToEntity(List<RoleDTO> dto)
-    {
+    public List<Role> dtoToEntity(List<RoleDTO> dto) {
         return dto.stream().map(this::dtoToEntity).collect(Collectors.toList());
     }
 }

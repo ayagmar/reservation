@@ -13,8 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailSenderService {
     @Autowired
     private JavaMailSender javaMailSender;
-    public void SendEmail(String To,String body,String Subject){
-        SimpleMailMessage message=new SimpleMailMessage();
+
+    public void SendEmail(String To, String body, String Subject) {
+        SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(To);
         message.setText(body);
         message.setSubject(Subject);

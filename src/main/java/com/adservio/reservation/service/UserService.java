@@ -4,15 +4,14 @@ import com.adservio.reservation.dao.RoleRepository;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
-import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -41,14 +39,13 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-
-    public List<UserDTO> listAll(){
+    public List<UserDTO> listAll() {
         return userconverter.entityToDto(userRepository.findAll());
     }
 
-    public UserDTO getById(Long id) throws NotFoundException{
-        Optional<User> user=userRepository.findById(id);
-        if(user.isEmpty()) throw new NotFoundException("User Not Available");
+    public UserDTO getById(Long id) throws NotFoundException {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) throw new NotFoundException("User Not Available");
         return userconverter.entityToDto(user.get());
     }
 
@@ -57,42 +54,39 @@ public class UserService implements UserDetailsService {
     }
 
     public User GetUserByUsername(String username) {
-       return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
 
 
-public void CancelBooking(String Bookcode) throws NotFoundException{
-        BookingDTO bookingDTO=bookingService.getBookingByCode(Bookcode);
-        Booking booking =bookingConvert.dtoToEntity(bookingDTO);
+    public void CancelBooking(String Bookcode) throws NotFoundException {
+        BookingDTO bookingDTO = bookingService.getBookingByCode(Bookcode);
+        Booking booking = bookingConvert.dtoToEntity(bookingDTO);
         System.out.println(booking);
-        if (booking!=null) {
+        if (booking != null) {
             bookingService.deleteBooking(booking.getId());
-        }
-        else {
+        } else {
             throw new NotFoundException("Booking not found");
         }
-}
+    }
 
-    public UserDTO save(UserDTO userDTO){
-        User user= userconverter.dtoToEntity(userDTO);
+    public UserDTO save(UserDTO userDTO) {
+        User user = userconverter.dtoToEntity(userDTO);
         user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user=userRepository.save(user);
+        user = userRepository.save(user);
         return userconverter.entityToDto(user);
     }
 
-    public List<UserDTO> saveUsers(List<UserDTO> userDTOS){
-        List<User> users= userconverter.dtoToEntity(userDTOS);
-        users=userRepository.saveAll(users);
+    public List<UserDTO> saveUsers(List<UserDTO> userDTOS) {
+        List<User> users = userconverter.dtoToEntity(userDTOS);
+        users = userRepository.saveAll(users);
         return userconverter.entityToDto(users);
 
     }
 
-    public void deleteUser(Long id){
+    public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
-
 
 
     public UserDTO updateUser(Long id, UserDTO userDTO) {
@@ -113,14 +107,14 @@ public void CancelBooking(String Bookcode) throws NotFoundException{
     }
 
     public Collection<BookingDTO> GetReservations(Long id) throws NotFoundException {
-       UserDTO userDTO=getById(id);
-       User user= userconverter.dtoToEntity(userDTO);
-        Collection<Booking> list=user.getBookings();
+        UserDTO userDTO = getById(id);
+        User user = userconverter.dtoToEntity(userDTO);
+        Collection<Booking> list = user.getBookings();
         return bookingConvert.entityToDto(list);
     }
 
-    public BookingDTO bookRoom(String Name, LocalDateTime Start,LocalDateTime End){
-        Booking booking=new Booking();
+    public BookingDTO bookRoom(String Name, LocalDateTime Start, LocalDateTime End) {
+        Booking booking = new Booking();
         booking.setRoom(roomRepository.findByName(Name));
         booking.setStartDate(Start);
         booking.setEndDate(End);
@@ -135,27 +129,21 @@ public void CancelBooking(String Bookcode) throws NotFoundException{
         appUser.getRoles().add(appRole);
     }
 
-    public List<User> FetchUsersByRole(String name){
-        Role role= roleRepository.findByRoleName(name);
+    public List<User> FetchUsersByRole(String name) {
+        Role role = roleRepository.findByRoleName(name);
         return userRepository.findByRoles_Id(role.getId());
     }
 
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user=userRepository.findByUsername(username);
-        if (user==null){
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
             throw new UsernameNotFoundException("Username not found in database");
         }
         Collection<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(),authorities);
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
-
-
-
-
-
 
 
 }

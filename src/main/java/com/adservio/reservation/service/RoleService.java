@@ -1,13 +1,14 @@
 package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.RoleRepository;
-import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.dto.RoleDTO;
+import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.RoleConvert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,6 @@ import java.util.Optional;
 public class RoleService {
     private final RoleRepository roleRepository;
     private final RoleConvert converter;
-
 
 
     public List<RoleDTO> listAll() {
@@ -34,7 +34,7 @@ public class RoleService {
 
     public List<RoleDTO> saveRoles(List<RoleDTO> roleDTOS) {
         List<Role> roles = converter.dtoToEntity(roleDTOS);
-        roles= roleRepository.saveAll(roles);
+        roles = roleRepository.saveAll(roles);
         return converter.entityToDto(roles);
 
     }
@@ -54,7 +54,6 @@ public class RoleService {
     public void deleteRole(Long id) {
         roleRepository.deleteById(id);
     }
-
 
 
 }

@@ -1,8 +1,6 @@
 package com.adservio.reservation.dto;
 
-import com.adservio.reservation.entities.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +23,8 @@ public class UserDTO {
     @Email
     @NotBlank(message = "Please enter the email")
     private String email;
-    @Length(max=30,min=6)
-    @NotBlank(message="Please enter the password")
+    @Length(max = 30, min = 6)
+    @NotBlank(message = "Please enter the password")
     @JsonIgnore
     private String Password;
     @JsonIgnore

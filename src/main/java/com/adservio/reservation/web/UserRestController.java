@@ -1,10 +1,11 @@
 package com.adservio.reservation.web;
+
 import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
-import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
@@ -25,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -51,43 +53,46 @@ public class UserRestController {
     private final BookingRepository bookingRepository;
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserDTO>> findAllUsers(){
+    public ResponseEntity<List<UserDTO>> findAllUsers() {
         return ResponseEntity.ok().body(service.listAll());
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> findUserById(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.getById(id));
     }
+
     @GetMapping("/reservations")
     public ResponseEntity<Collection<BookingDTO>> GetReservations() throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User LoggedInUser= service.GetUserByUsername(auth.getPrincipal().toString());
+        User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
         return ResponseEntity.ok().body(service.GetReservations(LoggedInUser.getId()));
     }
+
     @PostMapping("/book/{roomName}")
     public ResponseEntity<String> BookARoom(@PathVariable String roomName,
-                            @RequestParam String dateStart,
-                            @RequestParam String dateEnd,@RequestBody String description) throws NotFoundException {
-        LocalDateTime dateS =LocalDateTime.parse(dateStart);
-        LocalDateTime dateE =LocalDateTime.parse(dateEnd);
+                                            @RequestParam String dateStart,
+                                            @RequestParam String dateEnd, @RequestBody String description) throws NotFoundException {
+        LocalDateTime dateS = LocalDateTime.parse(dateStart);
+        LocalDateTime dateE = LocalDateTime.parse(dateEnd);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User LoggedInUser= service.GetUserByUsername(auth.getPrincipal().toString());
-        UserDTO userDTO=userConvert.entityToDto(LoggedInUser);
-        BookingDTO booking= service.bookRoom(roomName,dateS,dateE);
+        User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
+        UserDTO userDTO = userConvert.entityToDto(LoggedInUser);
+        BookingDTO booking = service.bookRoom(roomName, dateS, dateE);
         booking.setUser(userDTO);
         booking.setDescription(description);
-        if(dateS.isAfter(dateE) || dateE.isEqual(dateS) || dateE.isBefore(LocalDateTime.now()) ||dateS.isBefore(LocalDateTime.now())){
+        if (dateS.isAfter(dateE) || dateE.isEqual(dateS) || dateE.isBefore(LocalDateTime.now()) || dateS.isBefore(LocalDateTime.now())) {
             return ResponseEntity.badRequest().body("Your date does not fit criteria!");
         }
-        List<User> users=service.FetchUsersByRole(SecurityParams.ADMIN);
-        String Body="User "+booking.getUser().getFirstName()+" has reserved room "+booking.getRoom().getName().toString()+" with a duration of "
-                + ChronoUnit.HOURS.between(dateS,dateE)+" Hours"
-                +" From "+dateS+" To "+dateE;
+        List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
+        String Body = "User " + booking.getUser().getFirstName() + " has reserved room " + booking.getRoom().getName() + " with a duration of "
+                + ChronoUnit.HOURS.between(dateS, dateE) + " Hours"
+                + " From " + dateS + " To " + dateE;
         for (User user : users) {
-            try{
-                emailSenderService.SendEmail(user.getEmail(),Body,"Testing!");
-            }catch (MailException mailException) {
+            try {
+                emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
+            } catch (MailException mailException) {
                 mailException.printStackTrace();
             }
         }
@@ -99,82 +104,85 @@ public class UserRestController {
     public ResponseEntity<UserDTO> findUserByEmail(@PathVariable String email) {
         return ResponseEntity.ok().body(service.GetUserByEmail(email));
     }
+
     @PostMapping("/save")
-    public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO userDTO){
-        UserDTO result =service.save(userDTO);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return  ResponseEntity.created(uri).body(result);    }
+    public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO userDTO) {
+        UserDTO result = service.save(userDTO);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
+        return ResponseEntity.created(uri).body(result);
+    }
 
     @PostMapping("/save/all")
-    public ResponseEntity<List<UserDTO>> addUsers(@RequestBody List<UserDTO> userDTOS){
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save/all").toUriString());
-        return  ResponseEntity.created(uri).body(service.saveUsers(userDTOS));
+    public ResponseEntity<List<UserDTO>> addUsers(@RequestBody List<UserDTO> userDTOS) {
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save/all").toUriString());
+        return ResponseEntity.created(uri).body(service.saveUsers(userDTOS));
     }
+
     @DeleteMapping("/booking/cancel")
-    public ResponseEntity<String> Cancelbooking(@RequestParam String Code){
+    public ResponseEntity<String> Cancelbooking(@RequestParam String Code) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User LoggedInUser= service.GetUserByUsername(auth.getPrincipal().toString());
+        User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
 
         Collection<Booking> bookings = LoggedInUser.getBookings();
-        Booking booking=bookingRepository.findByCode(Code);
+        Booking booking = bookingRepository.findByCode(Code);
         LocalDateTime now = LocalDateTime.now();
 
-        if ( Objects.isNull(booking) ){
+        if (Objects.isNull(booking)) {
             return ResponseEntity.status(404).body("Please enter your correct reservation code!");
         }
 
-        if (booking.getEndDate().isBefore(now)){
+        if (booking.getEndDate().isBefore(now)) {
             return ResponseEntity.status(405).body("You cannot cancel a booking that has already ended!");
         }
 
-        if(bookings.contains(booking)){
+        if (bookings.contains(booking)) {
             System.out.println(bookings.contains(booking));
             bookingService.deleteBooking(booking.getId());
 
             return ResponseEntity.ok().body("DELETED SUCCESSFULLY");
-        }
-        else
+        } else
             System.out.println("ERROR DELETING RESERVATION");
         return ResponseEntity.status(405).body("Error deleting reservation that is not yours");
 
-        }
+    }
 
 
     @PutMapping("/{id}/update")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
-                              @RequestBody UserDTO user) {
-        UserDTO result = service.updateUser(id,user);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
-        return  ResponseEntity.created(uri).body(result);
+                                              @RequestBody UserDTO user) {
+        UserDTO result = service.updateUser(id, user);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
+        return ResponseEntity.created(uri).body(result);
     }
-@RequestMapping("/{id}/send")
-public String sendmail(@PathVariable("id") Long id) throws NotFoundException {
-UserDTO user=service.getById(id);
-    try {
-        emailSenderService.SendEmail(user.getEmail(),"teestt","Booking Reservation ");
-    } catch (MailException mailException) {
-        System.out.println(mailException);
-    }
-    return "Congratulations! Your mail has been send to the user.";
-}
 
-@RequestMapping("/admin/booking/confirm/{confirmed}")
-    public boolean ConfirmedReservation(@PathVariable boolean confirmed){
+    @RequestMapping("/{id}/send")
+    public String sendmail(@PathVariable("id") Long id) throws NotFoundException {
+        UserDTO user = service.getById(id);
+        try {
+            emailSenderService.SendEmail(user.getEmail(), "teestt", "Booking Reservation ");
+        } catch (MailException mailException) {
+            mailException.printStackTrace();
+        }
+        return "Congratulations! Your mail has been send to the user.";
+    }
+
+    @RequestMapping("/admin/booking/confirm/{confirmed}")
+    public boolean ConfirmedReservation(@PathVariable boolean confirmed) {
         return confirmed;
     }
 
 
     @DeleteMapping("/{id}/delete")
     public String deleteUser(@PathVariable Long id) {
-         service.deleteUser(id);
-         return "Delete successfully";
+        service.deleteUser(id);
+        return "Delete successfully";
     }
 
 
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(SecurityParams.JWT_HEADER_NAME);
-        if(authorizationHeader != null && authorizationHeader.startsWith(SecurityParams.JWT_HEADER_PREFIX)) {
+        if (authorizationHeader != null && authorizationHeader.startsWith(SecurityParams.JWT_HEADER_PREFIX)) {
             try {
                 String refresh_token = authorizationHeader.substring(SecurityParams.JWT_HEADER_PREFIX.length());
                 Algorithm algorithm = Algorithm.HMAC256(SecurityParams.PRIVATE_SECRET.getBytes());
@@ -193,7 +201,7 @@ UserDTO user=service.getById(id);
                 tokens.put("refresh_token", refresh_token);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            }catch (Exception exception) {
+            } catch (Exception exception) {
                 response.setHeader("error", exception.getMessage());
                 response.setStatus(FORBIDDEN.value());
                 //response.sendError(FORBIDDEN.value());

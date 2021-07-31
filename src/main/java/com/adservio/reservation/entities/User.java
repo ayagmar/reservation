@@ -1,10 +1,14 @@
 package com.adservio.reservation.entities;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
 @Data
@@ -15,21 +19,21 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false,length = 40)
+    @Column(nullable = false, length = 40)
     private String FirstName;
-    @Column(nullable = false,length = 40)
+    @Column(nullable = false, length = 40)
     private String LastName;
     private String username;
-    @Column(unique = true,length = 40,nullable = false)
+    @Column(unique = true, length = 40, nullable = false)
     private String email;
     @Column(nullable = false)
     private String password;
     private boolean active;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Collection<Role> roles = new ArrayList<>();
     @OneToMany(mappedBy = "user")
-    private Collection<Booking> bookings =new ArrayList<>();
+    private Collection<Booking> bookings = new ArrayList<>();
 
 
 }

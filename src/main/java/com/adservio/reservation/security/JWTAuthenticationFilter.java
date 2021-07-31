@@ -1,4 +1,5 @@
 package com.adservio.reservation.security;
+
 import com.adservio.reservation.entities.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -30,7 +31,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        User user = null;
+        User user;
         try {
             user = new ObjectMapper().readValue(request.getInputStream(), User.class);
             return authenticationManager.authenticate(
@@ -49,14 +50,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String access_token = JWT.create()
                 .withIssuer(request.getRequestURI())
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+SecurityParams.JWT_EXPIRATION))
+                .withExpiresAt(new Date(System.currentTimeMillis() + SecurityParams.JWT_EXPIRATION))
                 .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
 
         String refresh_token = JWT.create()
                 .withIssuer(request.getRequestURI())
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+SecurityParams.JWT_EXPIRATION*3))
+                .withExpiresAt(new Date(System.currentTimeMillis() + SecurityParams.JWT_EXPIRATION * 3))
                 .sign(algorithm);
 
         Map<String, String> tokens = new HashMap<>();

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,14 +25,14 @@ public class IReservationInitService {
 
     public void initRooms() {
 
-        Room r3=new Room();
-            Stream.of("Room01","Room02","Room03","Room04","Room05","Room06","Room07","Room08")
-                    .forEach(roomName->{
-                        Room room=new Room();
-                        room.setName(roomName);
-                        room.setDepartment(departmentRepository.findByName("Info"));
-                        roomRepository.save(room);
-                    });
+        Room r3 = new Room();
+        Stream.of("Room01", "Room02", "Room03", "Room04", "Room05", "Room06", "Room07", "Room08")
+                .forEach(roomName -> {
+                    Room room = new Room();
+                    room.setName(roomName);
+                    room.setDepartment(departmentRepository.findByName("Info"));
+                    roomRepository.save(room);
+                });
 
         r3.setName("Room09");
         r3.setDepartment(departmentRepository.findByName("Finance"));
@@ -42,9 +41,9 @@ public class IReservationInitService {
 
 
     public void initUser() {
-        User u =new User();
-        User u2=new User();
-        User u3=new User();
+        User u = new User();
+        User u2 = new User();
+        User u3 = new User();
         u.setEmail("User1Email@gmail.com");
         u.setUsername("user1");
         u.setFirstName("Jhonny");
@@ -80,11 +79,11 @@ public class IReservationInitService {
 
         String DateStart = "2021-07-29T08:00:00";
         String DateEnd = "2021-07-29T10:00:00";
-        LocalDateTime dateS =LocalDateTime.parse(DateStart);
-        LocalDateTime dateE =LocalDateTime.parse(DateEnd);
-        Booking b=new Booking();
-        Booking b2=new Booking();
-        Booking b3=new Booking();
+        LocalDateTime dateS = LocalDateTime.parse(DateStart);
+        LocalDateTime dateE = LocalDateTime.parse(DateEnd);
+        Booking b = new Booking();
+        Booking b2 = new Booking();
+        Booking b3 = new Booking();
         b.setDescription("BookingTest1");
         b.setUser(userRepository.findByUsername("user1"));
         b.setRoom(roomRepository.findByName("Room01"));
@@ -95,8 +94,8 @@ public class IReservationInitService {
         String DateStart2 = "2021-07-30T14:00:00";
         String DateEnd2 = "2021-07-30T15:00:00";
 
-        LocalDateTime dateS2 =LocalDateTime.parse(DateStart2);
-        LocalDateTime dateE2 =LocalDateTime.parse(DateEnd2);
+        LocalDateTime dateS2 = LocalDateTime.parse(DateStart2);
+        LocalDateTime dateE2 = LocalDateTime.parse(DateEnd2);
         b2.setDescription("BookingTest2");
         b2.setUser(userRepository.findByUsername("user1"));
         b2.setRoom(roomRepository.findByName("Room02"));
@@ -106,8 +105,8 @@ public class IReservationInitService {
         //----//
         String DateStart3 = "2021-07-29T10:00:00";
         String DateEnd3 = "2021-07-29T13:00:00";
-        LocalDateTime dateS3 =LocalDateTime.parse(DateStart3);
-        LocalDateTime dateE3 =LocalDateTime.parse(DateEnd3);
+        LocalDateTime dateS3 = LocalDateTime.parse(DateStart3);
+        LocalDateTime dateE3 = LocalDateTime.parse(DateEnd3);
         b3.setDescription("BookingTest3");
         b3.setUser(userRepository.findByUsername("user2"));
         b3.setRoom(roomRepository.findByName("Room01"));
@@ -122,19 +121,18 @@ public class IReservationInitService {
     }
 
 
-
     public void initDepartment() {
-        Department x=new Department();
-        Department y=new Department();
+        Department x = new Department();
+        Department y = new Department();
         x.setName("Info");
         y.setName("Finance");
         departmentRepository.save(x);
         departmentRepository.save(y);
     }
 
-    public void initRoles(){
-        Role R=new Role();
-        Role U=new Role();
+    public void initRoles() {
+        Role R = new Role();
+        Role U = new Role();
         R.setRoleName(SecurityParams.ADMIN);
         U.setRoleName(SecurityParams.USER);
         roleRepository.save(R);

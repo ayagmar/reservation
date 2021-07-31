@@ -1,6 +1,10 @@
 package com.adservio.reservation.entities;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,8 +23,8 @@ public class Room implements Serializable {
     @Column(nullable = false)
     private String name;
     @JsonIgnore
-    @OneToMany(mappedBy = "room",cascade = CascadeType.ALL)
-    private Collection<Booking> bookings =new ArrayList<>();
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private Collection<Booking> bookings = new ArrayList<>();
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Department department;

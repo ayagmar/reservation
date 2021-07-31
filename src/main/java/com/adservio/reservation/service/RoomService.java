@@ -3,10 +3,10 @@ package com.adservio.reservation.service;
 import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dto.BookingDTO;
+import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Room;
-import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.entities.User;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
@@ -16,10 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -63,9 +61,10 @@ public class RoomService {
         }
         return userConvert.entityToDto(users);
     }
+
     public RoomDTO getRoomByName(String name) throws NotFoundException {
-        if(name.isEmpty()) throw new NotFoundException("Insert a name to find room");
-        if(roomRepository.findByName(name)==null) throw new NotFoundException("Room not found");
+        if (name.isEmpty()) throw new NotFoundException("Insert a name to find room");
+        if (roomRepository.findByName(name) == null) throw new NotFoundException("Room not found");
         return converter.entityToDto(roomRepository.findByName(name));
     }
 
@@ -75,27 +74,25 @@ public class RoomService {
         return converter.entityToDto(room);
     }
 
-    public List<RoomDTO>FindAvailable(LocalDateTime datestart,LocalDateTime dateend){
-        if(dateend==null){
-            dateend=datestart.plusMonths(1);
+    public List<RoomDTO> FindAvailable(LocalDateTime datestart, LocalDateTime dateend) {
+        if (dateend == null) {
+            dateend = datestart.plusMonths(1);
         }
-        List<Room> availrooms=roomRepository.findMeetingRoomAvailable(datestart,dateend);
+        List<Room> availrooms = roomRepository.findMeetingRoomAvailable(datestart, dateend);
         return converter.entityToDto(availrooms);
     }
 
     public Collection<BookingDTO> listBookByRoom(Long roomid) throws NotFoundException {
-        RoomDTO roomDTO=getById(roomid);
-        Room room=converter.dtoToEntity(roomDTO);
-        Collection<Booking> list=room.getBookings();
+        RoomDTO roomDTO = getById(roomid);
+        Room room = converter.dtoToEntity(roomDTO);
+        Collection<Booking> list = room.getBookings();
         return bookingConvert.entityToDto(list);
     }
 
 
-
-
-    public RoomDTO GetLastReservedRoom(){
-        List<Booking> bookings =bookingRepository.findAll();
-        Booking latest =bookings.get(bookings.size()-1);
+    public RoomDTO GetLastReservedRoom() {
+        List<Booking> bookings = bookingRepository.findAll();
+        Booking latest = bookings.get(bookings.size() - 1);
         return converter.entityToDto(latest.getRoom());
     }
 

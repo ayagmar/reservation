@@ -3,10 +3,10 @@ package com.adservio.reservation.service;
 import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dao.UserRepository;
+import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.entities.Room;
-import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class BookingService {
-   public final
+    public final
     BookingRepository bookingRepository;
     public final
     BookingConvert converter;
@@ -32,16 +32,18 @@ public class BookingService {
     private final RestTemplate restTemplate;
 
 
-    public List<BookingDTO> listAll(){
+    public List<BookingDTO> listAll() {
 
         return converter.entityToDto(bookingRepository.findAll());
     }
-    public void DeleteByCode(String code){
+
+    public void DeleteByCode(String code) {
         bookingRepository.deleteByCode(code);
     }
+
     public BookingDTO getById(Long id) throws NotFoundException {
-        Optional<Booking> booking=bookingRepository.findById(id);
-        if(booking.isEmpty()) throw new NotFoundException("Reservation Not Available");
+        Optional<Booking> booking = bookingRepository.findById(id);
+        if (booking.isEmpty()) throw new NotFoundException("Reservation Not Available");
         return converter.entityToDto(booking.get());
     }
 
@@ -49,38 +51,38 @@ public class BookingService {
         return converter.entityToDto(bookingRepository.findByCode(code));
     }
 
-    public Collection<BookingDTO>GetAllByRoomName(String name){
-        Room room=roomRepository.findByName(name);
-        Collection<Booking> bookings=room.getBookings();
+    public Collection<BookingDTO> GetAllByRoomName(String name) {
+        Room room = roomRepository.findByName(name);
+        Collection<Booking> bookings = room.getBookings();
         return converter.entityToDto(bookings);
     }
+
     public UserDTO GetUserByBookingId(Long id) throws NotFoundException {
-        BookingDTO bookingDTO=getById(id);
+        BookingDTO bookingDTO = getById(id);
         return bookingDTO.getUser();
     }
 
     public BookingDTO save(BookingDTO bookingDTO) throws NotFoundException {
-        Booking booking=converter.dtoToEntity(bookingDTO);
+        Booking booking = converter.dtoToEntity(bookingDTO);
         booking.setCode(UUID.randomUUID().toString());
-        Room room=roomRepository.checkAvailability(booking.getStartDate(),booking.getEndDate(),booking.getRoom().getId());
-        if(room!=null){
+        Room room = roomRepository.checkAvailability(booking.getStartDate(), booking.getEndDate(), booking.getRoom().getId());
+        if (room != null) {
             booking = bookingRepository.save(booking);
             return converter.entityToDto(booking);
-        }
-        else {
+        } else {
             throw new NotFoundException("Room already in use");
         }
 
     }
 
-    public List<BookingDTO> saveDepartments(List<BookingDTO> bookingDTOS){
-        List<Booking> bookings=converter.dtoToEntity(bookingDTOS);
-        bookings=bookingRepository.saveAll(bookings);
+    public List<BookingDTO> saveDepartments(List<BookingDTO> bookingDTOS) {
+        List<Booking> bookings = converter.dtoToEntity(bookingDTOS);
+        bookings = bookingRepository.saveAll(bookings);
         return converter.entityToDto(bookings);
 
     }
 
-    public String deleteBooking(Long id){
+    public String deleteBooking(Long id) {
         bookingRepository.deleteById(id);
         return "Deleted successfully";
     }

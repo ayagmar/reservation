@@ -11,7 +11,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -20,13 +19,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/department")
 public class DepartmentRestController {
-   private final
+    private final
     DepartmentService service;
 
 
-
     @GetMapping("/all")
-    public ResponseEntity<List<DepartmentDTO>> findAllDepartments(){
+    public ResponseEntity<List<DepartmentDTO>> findAllDepartments() {
         return ResponseEntity.ok().body(service.listAll());
     }
 
@@ -46,35 +44,33 @@ public class DepartmentRestController {
 
         return ResponseEntity.ok().body(service.GetDepartmentByName(name));
     }
+
     @PostMapping("/save")
-    public ResponseEntity<DepartmentDTO> CreateDepartment(@RequestBody DepartmentDTO departmentDTO)throws URISyntaxException {
+    public ResponseEntity<DepartmentDTO> CreateDepartment(@RequestBody DepartmentDTO departmentDTO) throws URISyntaxException {
         DepartmentDTO result = service.save(departmentDTO);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/save").toUriString());
-        return  ResponseEntity.created(uri).body(result);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/save").toUriString());
+        return ResponseEntity.created(uri).body(result);
     }
 
     @PostMapping("/save/all")
-    public ResponseEntity<List<DepartmentDTO>> addDepartments(@RequestBody List<DepartmentDTO> departmentDTOS){
-    URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/save/all").toUriString());
+    public ResponseEntity<List<DepartmentDTO>> addDepartments(@RequestBody List<DepartmentDTO> departmentDTOS) {
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/save/all").toUriString());
         return ResponseEntity.created(uri).body(service.saveDepartments(departmentDTOS));
     }
 
     @PutMapping("/{id}/update")
     public ResponseEntity<DepartmentDTO> updateDepartment(@PathVariable("id") Long departmentId,
-                                       @RequestBody DepartmentDTO department)  throws URISyntaxException{
+                                                          @RequestBody DepartmentDTO department) throws URISyntaxException {
 
-        DepartmentDTO result = service.updateDepartment(departmentId,department);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/{id}/{update}").toUriString());
-        return  ResponseEntity.created(uri).body(result);
+        DepartmentDTO result = service.updateDepartment(departmentId, department);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/{id}/{update}").toUriString());
+        return ResponseEntity.created(uri).body(result);
     }
 
     @DeleteMapping("/{id}/delete")
     public String deleteDepartment(@PathVariable Long id) {
         return service.deleteDepartment(id);
     }
-
-
-
 
 
 }

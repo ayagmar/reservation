@@ -1,8 +1,8 @@
 package com.adservio.reservation.web;
+
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.dto.UserDTO;
-import com.adservio.reservation.entities.Room;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/room")
@@ -25,12 +26,12 @@ public class RoomRestController {
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<RoomDTO>> findAllRooms(){
+    public ResponseEntity<List<RoomDTO>> findAllRooms() {
         return ResponseEntity.ok().body(service.listAll());
     }
 
     @GetMapping("/{id}")
-    public  ResponseEntity<RoomDTO> findRoomById(@PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<RoomDTO> findRoomById(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.getById(id));
     }
 
@@ -39,27 +40,29 @@ public class RoomRestController {
         return ResponseEntity.ok().body(service.getRoomByName(name));
     }
 
-//    @GetMapping("/available/{dates}/{datee}")
+    //    @GetMapping("/available/{dates}/{datee}")
 //    public ResponseEntity<List<RoomDTO>> CheckAvailability(@PathVariable String dates,@PathVariable String datee) {
 //        return ResponseEntity.ok().body(service.FindAvailable(dates,datee));
 //    }
-@GetMapping("/available")
-public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
-                                                 @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME)
-                                                 LocalDateTime dateS,
-                                                 @RequestParam("dateEnd")
-                                                 @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateE){
+    @GetMapping("/available")
+    public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
+                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                                               LocalDateTime dateS,
+                                                       @RequestParam("dateEnd")
+                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateE) {
         return ResponseEntity.ok().body(service.FindAvailable(dateS, dateE));
-}
+    }
 
     @GetMapping("/{id}/bookings")
     public ResponseEntity<Collection<BookingDTO>> GetBookingsByRoom(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.listBookByRoom(id));
     }
+
     @GetMapping("/booking/latest")
     public ResponseEntity<RoomDTO> FetchLatestReservedRoom() throws NotFoundException {
         return ResponseEntity.ok().body(service.GetLastReservedRoom());
     }
+
     @GetMapping("/{id}/users")
     public ResponseEntity<Collection<UserDTO>> GetUsersByRoom(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.GetUsersByRoom(id));
@@ -68,24 +71,24 @@ public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
 
     @PostMapping("/save")
     public ResponseEntity<RoomDTO> addRoom(@RequestBody RoomDTO roomdto) throws URISyntaxException {
-        RoomDTO result =service.save(roomdto);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/save").toUriString());
-        return  ResponseEntity.created(uri).body(result);
+        RoomDTO result = service.save(roomdto);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/save").toUriString());
+        return ResponseEntity.created(uri).body(result);
     }
 
     @PostMapping("/save/all")
-    public ResponseEntity<List<RoomDTO>>  addRooms(@RequestBody List<RoomDTO> rooms)  throws URISyntaxException{
+    public ResponseEntity<List<RoomDTO>> addRooms(@RequestBody List<RoomDTO> rooms) throws URISyntaxException {
 
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/save/all").toUriString());
-        return  ResponseEntity.created(uri).body(service.saveRooms(rooms));
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/save/all").toUriString());
+        return ResponseEntity.created(uri).body(service.saveRooms(rooms));
     }
 
     @PutMapping("/{id}/update")
     public ResponseEntity<RoomDTO> updateRoom(@PathVariable("id") Long id,
-                                          @RequestBody RoomDTO room) {
-        RoomDTO result = service.updateRoom(id,room);
-        URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
-        return  ResponseEntity.created(uri).body(result);
+                                              @RequestBody RoomDTO room) {
+        RoomDTO result = service.updateRoom(id, room);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
+        return ResponseEntity.created(uri).body(result);
     }
 
 
