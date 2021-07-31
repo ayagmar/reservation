@@ -1,6 +1,4 @@
 package com.adservio.reservation.web;
-
-
 import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.entities.Booking;
@@ -33,6 +31,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,6 @@ public class UserRestController {
 
     private final BookingService bookingService;
     private final UserConvert userConvert;
-
 
     private final BookingRepository bookingRepository;
 
@@ -67,7 +65,7 @@ public class UserRestController {
         return ResponseEntity.ok().body(service.GetReservations(LoggedInUser.getId()));
     }
     @PostMapping("/book/{roomName}")
-    public String BookARoom(@PathVariable String roomName,
+    public ResponseEntity<String> BookARoom(@PathVariable String roomName,
                             @RequestParam String dateStart,
                             @RequestParam String dateEnd,@RequestBody String description) throws NotFoundException {
         LocalDateTime dateS =LocalDateTime.parse(dateStart);
@@ -79,8 +77,22 @@ public class UserRestController {
         BookingDTO booking= service.bookRoom(roomName,dateS,dateE);
         booking.setUser(userDTO);
         booking.setDescription(description);
+        if(dateS.isAfter(dateE) || dateE.isEqual(dateS) || dateE.isBefore(LocalDateTime.now()) ||dateS.isBefore(LocalDateTime.now())){
+            return ResponseEntity.badRequest().body("Your date does not fit criteria!");
+        }
+        List<User> users=service.FetchUsersByRole(SecurityParams.ADMIN);
+        String Body="User "+booking.getUser().getFirstName()+" has reserved room "+booking.getRoom().getName().toString()+" with a duration of "
+                + ChronoUnit.HOURS.between(dateS,dateE)+" Hours"
+                +" From "+dateS+" To "+dateE;
+        for (User user : users) {
+            try{
+                emailSenderService.SendEmail(user.getEmail(),Body,"Testing!");
+            }catch (MailException mailException) {
+                mailException.printStackTrace();
+            }
+        }
         bookingService.save(booking);
-        return "successfully added booking";
+        return ResponseEntity.ok().body("Added successfully");
     }
 
     @GetMapping("/findEMAIL/{email}")
@@ -98,19 +110,27 @@ public class UserRestController {
         URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save/all").toUriString());
         return  ResponseEntity.created(uri).body(service.saveUsers(userDTOS));
     }
-    @DeleteMapping("/booking/Cancel")
+    @DeleteMapping("/booking/cancel")
     public ResponseEntity<String> Cancelbooking(@RequestParam String Code){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User LoggedInUser= service.GetUserByUsername(auth.getPrincipal().toString());
 
         Collection<Booking> bookings = LoggedInUser.getBookings();
         Booking booking=bookingRepository.findByCode(Code);
-        if (booking==null){
-            return ResponseEntity.status(404).body("Please enter proper code!");
+        LocalDateTime now = LocalDateTime.now();
+
+        if ( Objects.isNull(booking) ){
+            return ResponseEntity.status(404).body("Please enter your correct reservation code!");
         }
+
+        if (booking.getEndDate().isBefore(now)){
+            return ResponseEntity.status(405).body("You cannot cancel a booking that has already ended!");
+        }
+
         if(bookings.contains(booking)){
             System.out.println(bookings.contains(booking));
             bookingService.deleteBooking(booking.getId());
+
             return ResponseEntity.ok().body("DELETED SUCCESSFULLY");
         }
         else

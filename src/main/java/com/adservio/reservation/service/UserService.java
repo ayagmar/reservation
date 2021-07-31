@@ -135,6 +135,11 @@ public void CancelBooking(String Bookcode) throws NotFoundException{
         appUser.getRoles().add(appRole);
     }
 
+    public List<User> FetchUsersByRole(String name){
+        Role role= roleRepository.findByRoleName(name);
+        return userRepository.findByRoles_Id(role.getId());
+    }
+
 
 
     @Override
