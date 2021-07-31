@@ -36,7 +36,9 @@ public class BookingService {
 
         return converter.entityToDto(bookingRepository.findAll());
     }
-
+    public void DeleteByCode(String code){
+        bookingRepository.deleteByCode(code);
+    }
     public BookingDTO getById(Long id) throws NotFoundException {
         Optional<Booking> booking=bookingRepository.findById(id);
         if(booking.isEmpty()) throw new NotFoundException("Reservation Not Available");

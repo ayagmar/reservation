@@ -1,4 +1,5 @@
 package com.adservio.reservation.web;
+
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
@@ -7,12 +8,9 @@ import com.adservio.reservation.service.EmailSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 @RequiredArgsConstructor
@@ -58,7 +56,7 @@ public class BookingRestController {
         return service.saveDepartments(bookingDTOS);
     }
 
-    @DeleteMapping("/{id}/update")
+    @DeleteMapping("/{id}/delete")
     public String deleteBooking(@PathVariable Long id) {
         return service.deleteBooking(id);
     }

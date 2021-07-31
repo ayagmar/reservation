@@ -35,6 +35,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final RoleRepository roleRepository;
+    private final BookingService bookingService;
     private final UserConvert userconverter;
     private final BookingConvert bookingConvert;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -60,7 +61,17 @@ public class UserService implements UserDetailsService {
     }
 
 
-
+public void CancelBooking(String Bookcode) throws NotFoundException{
+        BookingDTO bookingDTO=bookingService.getBookingByCode(Bookcode);
+        Booking booking =bookingConvert.dtoToEntity(bookingDTO);
+        System.out.println(booking);
+        if (booking!=null) {
+            bookingService.deleteBooking(booking.getId());
+        }
+        else {
+            throw new NotFoundException("Booking not found");
+        }
+}
 
     public UserDTO save(UserDTO userDTO){
         User user= userconverter.dtoToEntity(userDTO);

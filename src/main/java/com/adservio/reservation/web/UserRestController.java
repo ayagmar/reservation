@@ -8,7 +8,6 @@ import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
-import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
 import com.adservio.reservation.service.BookingService;
@@ -19,28 +18,18 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Path;
 import javax.validation.Valid;
-import java.awt.print.Book;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -53,12 +42,15 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 @RestController
 @RequestMapping("/api/user")
 public class UserRestController {
-    @Autowired
+
     private final UserService service;
     private final EmailSenderService emailSenderService;
-    private final BookingService bookingService;
 
+    private final BookingService bookingService;
     private final UserConvert userConvert;
+
+
+    private final BookingRepository bookingRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> findAllUsers(){
@@ -106,6 +98,27 @@ public class UserRestController {
         URI uri= URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save/all").toUriString());
         return  ResponseEntity.created(uri).body(service.saveUsers(userDTOS));
     }
+    @DeleteMapping("/booking/Cancel")
+    public ResponseEntity<String> Cancelbooking(@RequestParam String Code){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User LoggedInUser= service.GetUserByUsername(auth.getPrincipal().toString());
+
+        Collection<Booking> bookings = LoggedInUser.getBookings();
+        Booking booking=bookingRepository.findByCode(Code);
+        if (booking==null){
+            return ResponseEntity.status(404).body("Please enter proper code!");
+        }
+        if(bookings.contains(booking)){
+            System.out.println(bookings.contains(booking));
+            bookingService.deleteBooking(booking.getId());
+            return ResponseEntity.ok().body("DELETED SUCCESSFULLY");
+        }
+        else
+            System.out.println("ERROR DELETING RESERVATION");
+        return ResponseEntity.status(405).body("Error deleting reservation that is not yours");
+
+        }
+
 
     @PutMapping("/{id}/update")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
