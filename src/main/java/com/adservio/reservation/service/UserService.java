@@ -13,6 +13,8 @@ import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -85,7 +88,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        User user=userRepository.getById(id);
+        userRepository.delete(user);
     }
 
 
@@ -99,7 +103,11 @@ public class UserService implements UserDetailsService {
         if (Objects.nonNull(userDTO.getPassword()) &&
                 !"".equalsIgnoreCase(userDTO.getPassword())) {
             userDB.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
+        } if (Objects.nonNull(userDTO.getUsername()) &&
+                !"".equalsIgnoreCase(userDTO.getUsername())) {
+            userDB.setUsername(userDTO.getUsername());
         }
+
         userDB.setFirstName(userDTO.getFirstName());
         userDB.setLastName(userDTO.getLastName());
         userRepository.save(userDB);

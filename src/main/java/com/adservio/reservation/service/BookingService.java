@@ -14,10 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.awt.print.Book;
+import java.util.*;
 
 @Service
 @Transactional
@@ -51,10 +49,15 @@ public class BookingService {
         return converter.entityToDto(bookingRepository.findByCode(code));
     }
 
-    public Collection<BookingDTO> GetAllByRoomName(String name) {
+    public Collection<BookingDTO> GetAllByRoomName(String name) throws NotFoundException {
         Room room = roomRepository.findByName(name);
-        Collection<Booking> bookings = room.getBookings();
-        return converter.entityToDto(bookings);
+        if (Objects.isNull(room)) {
+            throw new NotFoundException("Room not found");
+        } else {
+
+            Collection<Booking> bookings = room.getBookings();
+            return converter.entityToDto(bookings);
+        }
     }
 
     public UserDTO GetUserByBookingId(Long id) throws NotFoundException {
@@ -82,9 +85,10 @@ public class BookingService {
 
     }
 
-    public String deleteBooking(Long id) {
-        bookingRepository.deleteById(id);
-        return "Deleted successfully";
+    public String deleteBooking(Long id)  {
+        Booking booking = bookingRepository.getById(id);
+            bookingRepository.deleteById(id);
+            return "Deleted successfully";
     }
 }
 //    String url="http://localhost:8080/api/user/admin/booking/confirm";

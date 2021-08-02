@@ -32,11 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.format.TextStyle;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +81,7 @@ public class UserRestController {
         LocalDateTime dateE = LocalDateTime.parse(dateEnd);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
         UserDTO userDTO = userConvert.entityToDto(LoggedInUser);
         BookingDTO booking = service.bookRoom(roomName, dateS, dateE);
@@ -90,20 +90,33 @@ public class UserRestController {
         if (dateS.isAfter(dateE) || dateE.isEqual(dateS) || dateE.isBefore(LocalDateTime.now()) || dateS.isBefore(LocalDateTime.now())) {
             return ResponseEntity.badRequest().body("Your date does not fit criteria!");
         }
-        List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
-        String Body = "User " + booking.getUser().getFirstName() + " has reserved room " + booking.getRoom().getName() + " with a duration of "
-                + ChronoUnit.HOURS.between(dateS, dateE) + " Hours"
-                + " On " + dateS.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"));
-        for (User user : users) {
-            try {
-                emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
-            } catch (MailException mailException) {
-                mailException.printStackTrace();
+        BookingDTO bookingDTO=bookingService.save(booking);
+        if(!Objects.isNull(bookingDTO)) {
+
+            Period period = Period.between(dateS.toLocalDate(), dateE.toLocalDate());
+            period = period.minusDays(dateE.toLocalTime().compareTo(dateS.toLocalTime()) >= 0 ? 0 : 1);
+            Duration duration = Duration.between(dateS, dateE);
+            duration = duration.minusDays(duration.toDaysPart());
+            int hours=duration.toHoursPart();
+            int minutes=duration.toMinutesPart();
+            String isday=(period.getDays()>0 ? (period.getDays()+"days"): "");
+            List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
+            String Body = "Reservation " + booking.getCode() + ": User " + booking.getUser().getFirstName() + " has reserved room "
+                    + booking.getRoom().getName() + " with a duration of "
+                    +isday
+                    + hours + " Hour"+(hours>1?"s ":" ")+minutes+" minute"+(minutes>0? "s ":" ")
+                    + "\nReservation starts at  " + dateS.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"));
+            for (User user : users) {
+                try {
+                    emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
+                } catch (MailException mailException) {
+                    mailException.printStackTrace();
+                }
             }
         }
-        bookingService.save(booking);
-        return ResponseEntity.ok().body("Added successfully");
+            return ResponseEntity.ok().body("Added successfully");
     }
+
 
     @GetMapping("/findEMAIL/{email}")
     public ResponseEntity<UserDTO> findUserByEmail(@PathVariable String email) {
@@ -124,7 +137,7 @@ public class UserRestController {
     }
 
     @DeleteMapping("/booking/cancel")
-    public ResponseEntity<String> Cancelbooking(@RequestParam String Code) {
+    public ResponseEntity<String> Cancelbooking(@RequestParam String Code)  {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
 
@@ -146,6 +159,7 @@ public class UserRestController {
             String Body ="User "+auth.getPrincipal().toString()+" has cancelled the reservation "
                     +booking.getCode()+
                     " at "+LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"))+" regarding room : "+booking.getRoom().getName();
+
             for (User user : users) {
                 try {
                     emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
@@ -161,7 +175,6 @@ public class UserRestController {
 
     }
 
-
     @PutMapping("/{id}/update")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                                               @RequestBody UserDTO user) {
@@ -170,6 +183,10 @@ public class UserRestController {
         return ResponseEntity.created(uri).body(result);
     }
 
+//    @RequestMapping("/booking/confirm/{confirmed}")
+//    public boolean ConfirmedReservation(@PathVariable boolean confirmed) {
+//        return confirmed; }
+//
 
 //    @RequestMapping("/{id}/send")
 //    public String sendmail(@PathVariable("id") Long id) throws NotFoundException {
@@ -182,16 +199,18 @@ public class UserRestController {
 //        return "Congratulations! Your mail has been send to the user.";
 //    }
 
-//    @RequestMapping("/admin/booking/confirm/{confirmed}")
-//    public boolean ConfirmedReservation(@PathVariable boolean confirmed) {
-//        return confirmed;
-//    }
 
 
     @DeleteMapping("/{id}/delete")
-    public String deleteUser(@PathVariable Long id) {
-        service.deleteUser(id);
-        return "Delete successfully";
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) throws NotFoundException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
+        if (LoggedInUser.getId().equals(service.getById(id).getId())) {
+            return ResponseEntity.status(405).body("cannot delete current logged in user");
+        } else {
+            service.deleteUser(id);
+            return ResponseEntity.ok().body("User deleted !");
+        }
     }
 
 

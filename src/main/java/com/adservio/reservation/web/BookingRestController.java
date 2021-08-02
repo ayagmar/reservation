@@ -43,13 +43,14 @@ public class BookingRestController {
     }
 
     @PostMapping("/save")
-    public BookingDTO addBooking(@RequestBody @Valid BookingDTO bookingDTO) throws NotFoundException {
+    public BookingDTO addBooking(@Valid @RequestBody BookingDTO bookingDTO) throws NotFoundException {
         return service.save(bookingDTO);
     }
 
     @GetMapping("/all/room/{name}")
-    public Collection<BookingDTO> FetchBookingsByRoomName(@PathVariable String name) {
-        return service.GetAllByRoomName(name);
+    public ResponseEntity<Collection<BookingDTO>> FetchBookingsByRoomName(@PathVariable String name) throws NotFoundException {
+
+        return ResponseEntity.ok().body(service.GetAllByRoomName(name));
     }
 
 
@@ -59,8 +60,8 @@ public class BookingRestController {
     }
 
     @DeleteMapping("/{id}/delete")
-    public String deleteBooking(@PathVariable Long id) {
-        return service.deleteBooking(id);
+    public ResponseEntity<String> deleteBooking(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.deleteBooking(id));
     }
 
 }

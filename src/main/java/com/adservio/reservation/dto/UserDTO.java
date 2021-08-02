@@ -25,8 +25,7 @@ public class UserDTO {
     private String email;
     @Length(max = 30, min = 6)
     @NotBlank(message = "Please enter the password")
-    @JsonIgnore
-    private String Password;
+    private String password;
     @JsonIgnore
     private Collection<RoleDTO> roles = new ArrayList<>();
     @JsonIgnore
