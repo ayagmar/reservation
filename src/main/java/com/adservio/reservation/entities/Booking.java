@@ -35,6 +35,8 @@ public class Booking implements Serializable {
     private String description;
     @Column(unique = true)
     private String code;
+    private boolean confirmed=false;
+
 
     @JsonIgnore
     @ManyToOne()

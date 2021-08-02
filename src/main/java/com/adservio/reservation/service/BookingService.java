@@ -26,8 +26,6 @@ public class BookingService {
     public final
     BookingConvert converter;
     public final RoomRepository roomRepository;
-    private final UserRepository userRepository;
-    private final RestTemplate restTemplate;
 
 
     public List<BookingDTO> listAll() {
@@ -68,6 +66,8 @@ public class BookingService {
     public BookingDTO save(BookingDTO bookingDTO) throws NotFoundException {
         Booking booking = converter.dtoToEntity(bookingDTO);
         booking.setCode(UUID.randomUUID().toString());
+        booking.getRoom().setReserved(true);
+        roomRepository.save(booking.getRoom());
         Room room = roomRepository.checkAvailability(booking.getStartDate(), booking.getEndDate(), booking.getRoom().getId());
         if (room != null) {
             booking = bookingRepository.save(booking);
@@ -76,6 +76,13 @@ public class BookingService {
             throw new NotFoundException("Room already in use");
         }
 
+    }
+
+    public void confirmBooking(Long id,boolean isconfirmed) throws NotFoundException {
+       BookingDTO bookingDTO=getById(id);
+       Booking booking=converter.dtoToEntity(bookingDTO);
+       booking.setConfirmed(isconfirmed);
+       bookingRepository.save(booking);
     }
 
     public List<BookingDTO> saveDepartments(List<BookingDTO> bookingDTOS) {
@@ -91,12 +98,3 @@ public class BookingService {
             return "Deleted successfully";
     }
 }
-//    String url="http://localhost:8080/api/user/admin/booking/confirm";
-//    boolean isconfirmed=restTemplate.getForObject(url,boolean.class);
-//            if(isconfirmed) {
-//                    booking = bookingRepository.save(booking);
-//                    }
-//                    else {
-//                    System.out.println("Booking not confirmed!");
-//                    }
-//                    return converter.entityToDto(booking);

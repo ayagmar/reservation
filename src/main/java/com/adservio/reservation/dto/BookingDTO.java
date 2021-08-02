@@ -21,6 +21,7 @@ public class BookingDTO {
     LocalDateTime EndDate;
     private String description;
     private String code;
+    private boolean confirmed;
     private RoomDTO room;
     private UserDTO user;
 

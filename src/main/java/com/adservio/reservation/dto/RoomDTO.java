@@ -11,6 +11,7 @@ import java.util.Collection;
 public class RoomDTO {
     private Long id;
     private String name;
+    boolean reserved=false;
     @JsonIgnore
     private DepartmentDTO department;
     @JsonIgnore

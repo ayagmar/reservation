@@ -87,7 +87,10 @@ public class UserRestController {
         BookingDTO booking = service.bookRoom(roomName, dateS, dateE);
         booking.setUser(userDTO);
         booking.setDescription(description);
-        if (dateS.isAfter(dateE) || dateE.isEqual(dateS) || dateE.isBefore(LocalDateTime.now()) || dateS.isBefore(LocalDateTime.now())) {
+        if (dateS.isAfter(dateE) ||
+                dateE.isEqual(dateS) ||
+                dateE.isBefore(LocalDateTime.now()) ||
+                dateS.isBefore(LocalDateTime.now()))  {
             return ResponseEntity.badRequest().body("Your date does not fit criteria!");
         }
         BookingDTO bookingDTO=bookingService.save(booking);
@@ -98,14 +101,18 @@ public class UserRestController {
             Duration duration = Duration.between(dateS, dateE);
             duration = duration.minusDays(duration.toDaysPart());
             int hours=duration.toHoursPart();
-            int minutes=duration.toMinutesPart();
+            String minutes=(duration.toMinutesPart()>0 ?(duration.toMinutesPart()+" minutes"):"");
             String isday=(period.getDays()>0 ? (period.getDays()+"days"): "");
             List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
             String Body = "Reservation " + booking.getCode() + ": User " + booking.getUser().getFirstName() + " has reserved room "
                     + booking.getRoom().getName() + " with a duration of "
                     +isday
-                    + hours + " Hour"+(hours>1?"s ":" ")+minutes+" minute"+(minutes>0? "s ":" ")
-                    + "\nReservation starts at  " + dateS.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"));
+                    + hours + " Hour"+(hours>1?"s ":" ")
+                    +minutes
+                    + "\nReservation starts at  " + dateS.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"))+
+                    "Please confirm  booking ID : "+bookingDTO.getId()+
+                    " by POST request at  http://localhost:8080/"+
+                    bookingDTO.getId()+"/confirm?true";
             for (User user : users) {
                 try {
                     emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
@@ -175,6 +182,8 @@ public class UserRestController {
 
     }
 
+
+
     @PutMapping("/{id}/update")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                                               @RequestBody UserDTO user) {
@@ -198,7 +207,6 @@ public class UserRestController {
 //        }
 //        return "Congratulations! Your mail has been send to the user.";
 //    }
-
 
 
     @DeleteMapping("/{id}/delete")

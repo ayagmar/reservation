@@ -22,6 +22,7 @@ public class Room implements Serializable {
     private Long id;
     @Column(nullable = false)
     private String name;
+    boolean reserved=false;
     @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private Collection<Booking> bookings = new ArrayList<>();
