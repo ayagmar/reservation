@@ -44,8 +44,8 @@ public class IReservationInitService {
         User u = new User();
         User u2 = new User();
         User u3 = new User();
-        u.setEmail("User1Email@gmail.com");
-        u.setUsername("user1");
+        u.setEmail("Admin1Email@gmail.com");
+        u.setUsername("admin1");
         u.setFirstName("Jhonny");
         u.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u.setLastName("Depp");
@@ -53,16 +53,16 @@ public class IReservationInitService {
         u.getRoles().add(roleRepository.findByRoleName(SecurityParams.USER));
         u.setActive(true);
         //-----//
-        u2.setEmail("User2Email@gmail.com");
-        u2.setUsername("user2");
+        u2.setEmail("User1Email@gmail.com");
+        u2.setUsername("user1");
         u2.setFirstName("Daniel");
         u2.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u2.setLastName("Raddclif");
         u2.getRoles().add(roleRepository.findByRoleName(SecurityParams.USER));
         u2.setActive(true);
         //-----//
-        u3.setEmail("User3Email@gmail.com");
-        u3.setUsername("user3");
+        u3.setEmail("User2Email@gmail.com");
+        u3.setUsername("user2");
         u3.setFirstName("Adam");
         u3.setPassword("$2a$10$mktizboxOpE4tRtlvvDhaeH9tbXpeMppNmoJjakS6i7UshQmLS./y");
         u3.setLastName("Sandler");

@@ -58,16 +58,16 @@ public class DepartmentRestController {
         return ResponseEntity.created(uri).body(service.saveDepartments(departmentDTOS));
     }
 
-    @PutMapping("/{id}/update")
+    @PutMapping("/update/{id}")
     public ResponseEntity<DepartmentDTO> updateDepartment(@PathVariable("id") Long departmentId,
                                                           @RequestBody DepartmentDTO department) throws URISyntaxException {
 
         DepartmentDTO result = service.updateDepartment(departmentId, department);
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/{id}/{update}").toUriString());
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/department/update/{id}").toUriString());
         return ResponseEntity.created(uri).body(result);
     }
 
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/delete/{id}")
     public String deleteDepartment(@PathVariable Long id) {
         return service.deleteDepartment(id);
     }

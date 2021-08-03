@@ -2,7 +2,6 @@ package com.adservio.reservation.web;
 
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.UserDTO;
-import com.adservio.reservation.entities.Booking;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.BookingService;
 import com.adservio.reservation.service.EmailSenderService;
@@ -60,11 +59,11 @@ public class BookingRestController {
         return service.saveDepartments(bookingDTOS);
     }
 
-    @PostMapping("/{id}/authorize")
-    public ResponseEntity<String> confirmBooking (@RequestParam boolean confirm,@PathVariable Long id) throws NotFoundException {
-        service.confirmBooking(id,confirm);
-        if(confirm)
-        return ResponseEntity.ok().body("confirmed");
+    @PostMapping("/{id}/confirm")
+    public ResponseEntity<String> confirmBooking(@RequestParam boolean confirmed, @PathVariable Long id) throws NotFoundException {
+        service.confirmBooking(id, confirmed);
+        if (confirmed)
+            return ResponseEntity.ok().body("confirmed");
         else {
             return ResponseEntity.ok().body("not confirmed!");
 

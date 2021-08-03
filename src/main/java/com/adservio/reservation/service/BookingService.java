@@ -2,7 +2,6 @@ package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoomRepository;
-import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.Booking;
@@ -12,9 +11,8 @@ import com.adservio.reservation.mapper.BookingConvert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import java.awt.print.Book;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -47,6 +45,16 @@ public class BookingService {
         return converter.entityToDto(bookingRepository.findByCode(code));
     }
 
+    public BookingDTO bookRoom(String Name, LocalDateTime Start, LocalDateTime End) {
+        Booking booking = new Booking();
+        booking.setRoom(roomRepository.findByName(Name));
+        booking.setStartDate(Start);
+        booking.setEndDate(End);
+        booking.setCode(UUID.randomUUID().toString());
+        return converter.entityToDto(booking);
+    }
+
+
     public Collection<BookingDTO> GetAllByRoomName(String name) throws NotFoundException {
         Room room = roomRepository.findByName(name);
         if (Objects.isNull(room)) {
@@ -66,7 +74,6 @@ public class BookingService {
     public BookingDTO save(BookingDTO bookingDTO) throws NotFoundException {
         Booking booking = converter.dtoToEntity(bookingDTO);
         booking.setCode(UUID.randomUUID().toString());
-        booking.getRoom().setReserved(true);
         roomRepository.save(booking.getRoom());
         Room room = roomRepository.checkAvailability(booking.getStartDate(), booking.getEndDate(), booking.getRoom().getId());
         if (room != null) {
@@ -78,11 +85,13 @@ public class BookingService {
 
     }
 
-    public void confirmBooking(Long id,boolean isconfirmed) throws NotFoundException {
-       BookingDTO bookingDTO=getById(id);
-       Booking booking=converter.dtoToEntity(bookingDTO);
-       booking.setConfirmed(isconfirmed);
-       bookingRepository.save(booking);
+    public void confirmBooking(Long id, boolean isconfirmed) throws NotFoundException {
+        BookingDTO bookingDTO = getById(id);
+        Booking booking = converter.dtoToEntity(bookingDTO);
+        booking.setConfirmed(isconfirmed);
+        booking.getRoom().setReserved(true);
+        roomRepository.save(booking.getRoom());
+        bookingRepository.save(booking);
     }
 
     public List<BookingDTO> saveDepartments(List<BookingDTO> bookingDTOS) {
@@ -92,9 +101,9 @@ public class BookingService {
 
     }
 
-    public String deleteBooking(Long id)  {
+    public String deleteBooking(Long id) {
         Booking booking = bookingRepository.getById(id);
-            bookingRepository.deleteById(id);
-            return "Deleted successfully";
+        bookingRepository.deleteById(id);
+        return "Deleted successfully";
     }
 }

@@ -1,29 +1,14 @@
 package com.adservio.reservation.web;
 
-import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.UserDTO;
-import com.adservio.reservation.entities.Booking;
-import com.adservio.reservation.entities.Role;
 import com.adservio.reservation.entities.User;
 import com.adservio.reservation.exception.NotFoundException;
-import com.adservio.reservation.mapper.UserConvert;
-import com.adservio.reservation.security.SecurityParams;
-import com.adservio.reservation.service.BookingService;
-import com.adservio.reservation.service.EmailSenderService;
 import com.adservio.reservation.service.UserService;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -32,14 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RequiredArgsConstructor
 @RestController
@@ -47,14 +27,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 public class UserRestController {
 
     private final UserService service;
-    private final EmailSenderService emailSenderService;
-
-    private final BookingService bookingService;
-    private final UserConvert userConvert;
-
-    private final BookingRepository bookingRepository;
-
-
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> findAllUsers() {
@@ -73,55 +45,12 @@ public class UserRestController {
         return ResponseEntity.ok().body(service.GetReservations(LoggedInUser.getId()));
     }
 
-    @PostMapping("/book/{roomName}")
-    public ResponseEntity<String> BookARoom(@PathVariable String roomName,
-                                            @RequestParam String dateStart,
-                                            @RequestParam String dateEnd, @RequestBody String description) throws NotFoundException {
-        LocalDateTime dateS = LocalDateTime.parse(dateStart);
-        LocalDateTime dateE = LocalDateTime.parse(dateEnd);
 
+    @PostMapping("/book/")
+    public ResponseEntity<String> BookARoom(@RequestBody UserService.UserBookingForm form) throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
-        UserDTO userDTO = userConvert.entityToDto(LoggedInUser);
-        BookingDTO booking = service.bookRoom(roomName, dateS, dateE);
-        booking.setUser(userDTO);
-        booking.setDescription(description);
-        if (dateS.isAfter(dateE) ||
-                dateE.isEqual(dateS) ||
-                dateE.isBefore(LocalDateTime.now()) ||
-                dateS.isBefore(LocalDateTime.now()))  {
-            return ResponseEntity.badRequest().body("Your date does not fit criteria!");
-        }
-        BookingDTO bookingDTO=bookingService.save(booking);
-        if(!Objects.isNull(bookingDTO)) {
-
-            Period period = Period.between(dateS.toLocalDate(), dateE.toLocalDate());
-            period = period.minusDays(dateE.toLocalTime().compareTo(dateS.toLocalTime()) >= 0 ? 0 : 1);
-            Duration duration = Duration.between(dateS, dateE);
-            duration = duration.minusDays(duration.toDaysPart());
-            int hours=duration.toHoursPart();
-            String minutes=(duration.toMinutesPart()>0 ?(duration.toMinutesPart()+" minutes"):"");
-            String isday=(period.getDays()>0 ? (period.getDays()+"days"): "");
-            List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
-            String Body = "Reservation " + booking.getCode() + ": User " + booking.getUser().getFirstName() + " has reserved room "
-                    + booking.getRoom().getName() + " with a duration of "
-                    +isday
-                    + hours + " Hour"+(hours>1?"s ":" ")
-                    +minutes
-                    + "\nReservation starts at  " + dateS.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"))+
-                    "Please confirm  booking ID : "+bookingDTO.getId()+
-                    " by POST request at  http://localhost:8080/"+
-                    bookingDTO.getId()+"/confirm?true";
-            for (User user : users) {
-                try {
-                    emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
-                } catch (MailException mailException) {
-                    mailException.printStackTrace();
-                }
-            }
-        }
-            return ResponseEntity.ok().body("Added successfully");
+        return service.bookRoom(form, LoggedInUser.getId());
     }
 
 
@@ -144,72 +73,23 @@ public class UserRestController {
     }
 
     @DeleteMapping("/booking/cancel")
-    public ResponseEntity<String> Cancelbooking(@RequestParam String Code)  {
+    public ResponseEntity<String> cancelBooking(@RequestBody String Code) throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
-
-        Collection<Booking> bookings = LoggedInUser.getBookings();
-        Booking booking = bookingRepository.findByCode(Code);
-        LocalDateTime now = LocalDateTime.now();
-
-        if (Objects.isNull(booking)) {
-            return ResponseEntity.status(404).body("Please enter your correct reservation code!");
-        }
-
-        if (booking.getEndDate().isBefore(now)) {
-            return ResponseEntity.status(405).body("You cannot cancel a booking that has already ended!");
-        }
-
-        if (bookings.contains(booking)) {
-            bookingService.deleteBooking(booking.getId());
-            List<User> users = service.FetchUsersByRole(SecurityParams.ADMIN);
-            String Body ="User "+auth.getPrincipal().toString()+" has cancelled the reservation "
-                    +booking.getCode()+
-                    " at "+LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm"))+" regarding room : "+booking.getRoom().getName();
-
-            for (User user : users) {
-                try {
-                    emailSenderService.SendEmail(user.getEmail(), Body, "Testing!");
-                } catch (MailException mailException) {
-                    mailException.printStackTrace();
-                }
-            }
-
-            return ResponseEntity.ok().body("DELETED SUCCESSFULLY");
-        } else {
-            return ResponseEntity.status(405).body("Error deleting reservation that is not yours");
-        }
+        return service.cancelBooking(LoggedInUser.getId(), Code);
 
     }
 
 
-
-    @PutMapping("/{id}/update")
+    @PutMapping("/update/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id,
                                               @RequestBody UserDTO user) {
         UserDTO result = service.updateUser(id, user);
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/update/{id}").toUriString());
         return ResponseEntity.created(uri).body(result);
     }
 
-//    @RequestMapping("/booking/confirm/{confirmed}")
-//    public boolean ConfirmedReservation(@PathVariable boolean confirmed) {
-//        return confirmed; }
-//
-
-//    @RequestMapping("/{id}/send")
-//    public String sendmail(@PathVariable("id") Long id) throws NotFoundException {
-//        UserDTO user = service.getById(id);
-//        try {
-//            emailSenderService.SendEmail(user.getEmail(), "teestt", "Booking Reservation ");
-//        } catch (MailException mailException) {
-//            mailException.printStackTrace();
-//        }
-//        return "Congratulations! Your mail has been send to the user.";
-//    }
-
-
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
@@ -223,39 +103,10 @@ public class UserRestController {
 
 
     @GetMapping("/token/refresh")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String authorizationHeader = request.getHeader(SecurityParams.JWT_HEADER_NAME);
-        if (authorizationHeader != null && authorizationHeader.startsWith(SecurityParams.JWT_HEADER_PREFIX)) {
-            try {
-                String refresh_token = authorizationHeader.substring(SecurityParams.JWT_HEADER_PREFIX.length());
-                Algorithm algorithm = Algorithm.HMAC256(SecurityParams.PRIVATE_SECRET.getBytes());
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(refresh_token);
-                String username = decodedJWT.getSubject();
-                User user = service.GetUserByUsername(username);
-                String access_token = JWT.create()
-                        .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + SecurityParams.JWT_EXPIRATION))
-                        .withIssuer(request.getRequestURL().toString())
-                        .withClaim("roles", user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList()))
-                        .sign(algorithm);
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", access_token);
-                tokens.put("refresh_token", refresh_token);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            } catch (Exception exception) {
-                response.setHeader("error", exception.getMessage());
-                response.setStatus(FORBIDDEN.value());
-                //response.sendError(FORBIDDEN.value());
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", exception.getMessage());
-                response.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
-            }
-        } else {
-            throw new RuntimeException("Refresh token is missing");
-        }
+    public void TokenRefresh(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        service.refreshToken(request, response);
     }
+
+
 }
 

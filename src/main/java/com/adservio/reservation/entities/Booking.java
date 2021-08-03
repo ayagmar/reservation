@@ -35,14 +35,14 @@ public class Booking implements Serializable {
     private String description;
     @Column(unique = true)
     private String code;
-    private boolean confirmed=false;
+    private boolean confirmed = false;
 
 
     @JsonIgnore
     @ManyToOne()
     @JoinTable(name = "users_reservations",
-            joinColumns = @JoinColumn(name = "booking_id", referencedColumnName="id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName="id"))
+            joinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private User user;
 
 

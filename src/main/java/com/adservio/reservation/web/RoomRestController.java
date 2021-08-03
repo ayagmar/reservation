@@ -83,16 +83,16 @@ public class RoomRestController {
         return ResponseEntity.created(uri).body(service.saveRooms(rooms));
     }
 
-    @PutMapping("/{id}/update")
+    @PutMapping("update/{id}")
     public ResponseEntity<RoomDTO> updateRoom(@PathVariable("id") Long id,
                                               @RequestBody RoomDTO room) {
         RoomDTO result = service.updateRoom(id, room);
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/{id}/update").toUriString());
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/update/{id}").toUriString());
         return ResponseEntity.created(uri).body(result);
     }
 
 
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/delete/{id}")
     public String deleteRoom(@PathVariable Long id) {
         service.deleteRoom(id);
         return "Deleted successfully";

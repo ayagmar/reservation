@@ -2,7 +2,6 @@ package com.adservio.reservation;
 
 
 import com.adservio.reservation.service.IReservationInitService;
-import com.adservio.reservation.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
@@ -54,7 +53,6 @@ public class ReservationSystemApplication implements CommandLineRunner {
         reservationInitService.initDepartment();
         reservationInitService.initRooms();
         reservationInitService.initReservation();
-
 
 
     }

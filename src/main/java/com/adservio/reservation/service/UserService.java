@@ -1,7 +1,7 @@
 package com.adservio.reservation.service;
 
+import com.adservio.reservation.dao.BookingRepository;
 import com.adservio.reservation.dao.RoleRepository;
-import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dao.UserRepository;
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.UserDTO;
@@ -12,9 +12,16 @@ import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,24 +29,33 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import java.io.Serializable;
+import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository;
     private final RoleRepository roleRepository;
     private final BookingService bookingService;
     private final UserConvert userconverter;
     private final BookingConvert bookingConvert;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EmailSenderService emailSenderService;
 
 
     public List<UserDTO> listAll() {
@@ -60,16 +76,95 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+    @Data
+    public static class UserBookingForm {
+        private String dateStart;
+        private String dateEnd;
+        private String description;
+        private String roomName;
 
-    public void CancelBooking(String Bookcode) throws NotFoundException {
-        BookingDTO bookingDTO = bookingService.getBookingByCode(Bookcode);
-        Booking booking = bookingConvert.dtoToEntity(bookingDTO);
-        System.out.println(booking);
-        if (booking != null) {
-            bookingService.deleteBooking(booking.getId());
-        } else {
-            throw new NotFoundException("Booking not found");
+    }
+
+    public ResponseEntity<String> bookRoom(UserBookingForm form, Long id) throws NotFoundException {
+        LocalDateTime dateS = LocalDateTime.parse(form.dateStart);
+        LocalDateTime dateE = LocalDateTime.parse(form.dateEnd);
+        UserDTO userDTO = getById(id);
+        BookingDTO booking = bookingService.bookRoom(form.roomName, dateS, dateE);
+        booking.setUser(userDTO);
+        booking.setDescription(form.description);
+        if (dateS.isAfter(dateE) ||
+                dateE.isEqual(dateS) ||
+                dateE.isBefore(LocalDateTime.now()) ||
+                dateS.isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body("Your date does not fit criteria!");
         }
+        BookingDTO bookingDTO = bookingService.save(booking);
+
+        if (!Objects.isNull(bookingDTO)) {
+
+            Period period = Period.between(dateS.toLocalDate(), dateE.toLocalDate());
+            period = period.minusDays(dateE.toLocalTime().compareTo(dateS.toLocalTime()) >= 0 ? 0 : 1);
+            Duration duration = Duration.between(dateS, dateE);
+            duration = duration.minusDays(duration.toDaysPart());
+            int hours = duration.toHoursPart();
+            String minutes = (duration.toMinutesPart() > 0 ? (duration.toMinutesPart() + " minutes") : "");
+            String days = period.getDays() > 1 ? " days" : " day";
+            String isday = (period.getDays() > 0 ? (period.getDays() + days) : "");
+            List<User> users = FetchUsersByRole(SecurityParams.ADMIN);
+            String Body = "Reservation " + booking.getCode() + ": User " + booking.getUser().getFirstName() + " has reserved room "
+                    + booking.getRoom().getName() + " with a duration of "
+                    + isday
+                    + hours + " Hour" + (hours > 1 ? "s " : " ")
+                    + minutes
+                    + "\n\nReservation starts at  " + dateS.format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm")) +
+                    " Please confirm  booking ID : " + bookingDTO.getId() +
+                    " with a  POST request at  http://localhost:8080/" +
+                    bookingDTO.getId() + "/confirm?confirmed=true";
+            for (User user : users) {
+                try {
+                    emailSenderService.SendEmail(user.getEmail(), Body, "Confirm Booking!");
+                } catch (MailException mailException) {
+                    mailException.printStackTrace();
+                }
+            }
+        }
+        return ResponseEntity.ok().body("Added successfully");
+    }
+
+
+    public ResponseEntity<String> cancelBooking(Long id, String Code) throws NotFoundException {
+        User user = userRepository.getById(id);
+        Collection<Booking> bookings = user.getBookings();
+        Booking booking = bookingRepository.findByCode(Code);
+        LocalDateTime now = LocalDateTime.now();
+        if (Objects.isNull(booking)) {
+            return ResponseEntity.status(404).body("Please enter your correct reservation code!");
+        }
+
+        if (booking.getEndDate().isBefore(now)) {
+            return ResponseEntity.status(405).body("You cannot cancel a booking that has already ended!");
+        }
+
+        if (bookings.contains(booking)) {
+            bookingService.deleteBooking(booking.getId());
+            List<User> users = FetchUsersByRole(SecurityParams.ADMIN);
+            String Body = "User " + user.getUsername() + " has cancelled the reservation "
+                    + booking.getCode() +
+                    " at " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEE, d MMM yyyy HH:mm")) + " regarding room : " + booking.getRoom().getName();
+
+            for (User user1 : users) {
+                try {
+                    emailSenderService.SendEmail(user1.getEmail(), Body, "Testing!");
+                } catch (MailException mailException) {
+                    mailException.printStackTrace();
+                }
+            }
+
+            return ResponseEntity.ok().body("DELETED SUCCESSFULLY");
+        } else {
+            return ResponseEntity.status(405).body("Error deleting reservation that is not yours");
+        }
+
     }
 
     public UserDTO save(UserDTO userDTO) {
@@ -88,7 +183,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long id) {
-        User user=userRepository.getById(id);
+        User user = userRepository.getById(id);
         userRepository.delete(user);
     }
 
@@ -103,7 +198,8 @@ public class UserService implements UserDetailsService {
         if (Objects.nonNull(userDTO.getPassword()) &&
                 !"".equalsIgnoreCase(userDTO.getPassword())) {
             userDB.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-        } if (Objects.nonNull(userDTO.getUsername()) &&
+        }
+        if (Objects.nonNull(userDTO.getUsername()) &&
                 !"".equalsIgnoreCase(userDTO.getUsername())) {
             userDB.setUsername(userDTO.getUsername());
         }
@@ -119,15 +215,6 @@ public class UserService implements UserDetailsService {
         User user = userconverter.dtoToEntity(userDTO);
         Collection<Booking> list = user.getBookings();
         return bookingConvert.entityToDto(list);
-    }
-
-    public BookingDTO bookRoom(String Name, LocalDateTime Start, LocalDateTime End) {
-        Booking booking = new Booking();
-        booking.setRoom(roomRepository.findByName(Name));
-        booking.setStartDate(Start);
-        booking.setEndDate(End);
-        booking.setCode(UUID.randomUUID().toString());
-        return bookingConvert.entityToDto(booking);
     }
 
 
@@ -151,6 +238,41 @@ public class UserService implements UserDetailsService {
         }
         Collection<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+    }
+
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String authorizationHeader = request.getHeader(SecurityParams.JWT_HEADER_NAME);
+        if (authorizationHeader != null && authorizationHeader.startsWith(SecurityParams.JWT_HEADER_PREFIX)) {
+            try {
+                String refresh_token = authorizationHeader.substring(SecurityParams.JWT_HEADER_PREFIX.length());
+                Algorithm algorithm = Algorithm.HMAC256(SecurityParams.PRIVATE_SECRET.getBytes());
+                JWTVerifier verifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = verifier.verify(refresh_token);
+                String username = decodedJWT.getSubject();
+                User user = GetUserByUsername(username);
+                String access_token = JWT.create()
+                        .withSubject(user.getUsername())
+                        .withExpiresAt(new Date(System.currentTimeMillis() + SecurityParams.JWT_EXPIRATION))
+                        .withIssuer(request.getRequestURL().toString())
+                        .withClaim("roles", user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList()))
+                        .sign(algorithm);
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", access_token);
+                tokens.put("refresh_token", refresh_token);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            } catch (Exception exception) {
+                response.setHeader("error", exception.getMessage());
+                response.setStatus(FORBIDDEN.value());
+                Map<String, String> error = new HashMap<>();
+                error.put("error_message", exception.getMessage());
+                response.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), error);
+            }
+        } else {
+            throw new RuntimeException("Refresh token is missing");
+        }
     }
 
 

@@ -7,10 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,29 +20,27 @@ public class ScheduleService {
     private final EmailSenderService emailSenderService;
     private final RoomRepository roomRepository;
 
- @Scheduled(cron="0 0/10 * * * *")
+    @Scheduled(cron = "0 0/10 * * * *")
+    public void job1() throws InterruptedException {
 
+        LocalDateTime currentDate = LocalDateTime.now();
+        List<Booking> bookingList = bookingRepository.findAll();
+        List<Booking> activeBookings = new ArrayList<>();
 
- public void job1() throws InterruptedException{
-
-        LocalDateTime currentDate=LocalDateTime.now();
-        List<Booking> bookingList=bookingRepository.findAll();
-        List<Booking> activeBookings=new ArrayList<>();
-
-        for(Booking booking:bookingList){
+        for (Booking booking : bookingList) {
             if (booking.getEndDate().plusMinutes(5).isAfter(currentDate))
                 activeBookings.add(booking);
         }
 
-        for(Booking activeBooking:activeBookings){
+        for (Booking activeBooking : activeBookings) {
             System.out.println(activeBooking.getCode());
             System.out.println(activeBooking.getEndDate());
-            if(activeBooking.getEndDate().truncatedTo(ChronoUnit.SECONDS).isEqual(currentDate.truncatedTo(ChronoUnit.SECONDS))){
-                String body="your room "+activeBooking.getRoom().getName()+" is now free, booking "+activeBooking.getCode()+" has ended ";
-                String to=activeBooking.getUser().getEmail();
-                String subject="Reservation completed";
+            if (activeBooking.getEndDate().truncatedTo(ChronoUnit.SECONDS).isEqual(currentDate.truncatedTo(ChronoUnit.SECONDS))) {
+                String body = "your room " + activeBooking.getRoom().getName() + " is now free, booking " + activeBooking.getCode() + " has ended ";
+                String to = activeBooking.getUser().getEmail();
+                String subject = "Reservation completed";
                 try {
-                    emailSenderService.SendEmail(to, body,subject);
+                    emailSenderService.SendEmail(to, body, subject);
                 } catch (MailException mailException) {
                     mailException.printStackTrace();
                 }
@@ -53,7 +49,7 @@ public class ScheduleService {
             }
 
         }
-        System.out.println("Ran Job at "+LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        System.out.println("Ran Job at " + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
 }

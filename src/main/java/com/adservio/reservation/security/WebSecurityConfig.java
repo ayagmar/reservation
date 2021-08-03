@@ -34,6 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-ui/**"
 
     };
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // http.authorizeRequests().anyRequest().permitAll();
