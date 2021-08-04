@@ -1,0 +1,20 @@
+package com.adservio.reservation.utilClass;
+
+import lombok.Data;
+
+
+
+public class FormClass {
+    @Data
+    public static class UserBookingForm {
+        private String dateStart;
+        private String dateEnd;
+        private String description;
+        private String roomName;
+    }
+
+
+
+
+
+}

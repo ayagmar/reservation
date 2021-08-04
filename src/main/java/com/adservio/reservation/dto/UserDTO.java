@@ -17,8 +17,8 @@ import java.util.Collection;
 public class UserDTO {
 
     private Long id;
-    private String FirstName;
-    private String LastName;
+    private String firstName;
+    private String lastName;
     private String username;
     @Email
     @NotBlank(message = "Please enter the email")

@@ -12,6 +12,7 @@ import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
+import com.adservio.reservation.utilClass.FormClass;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -34,6 +35,8 @@ import org.springframework.util.MimeTypeUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -76,22 +79,43 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
-    @Data
-    public static class UserBookingForm {
-        private String dateStart;
-        private String dateEnd;
-        private String description;
-        private String roomName;
-
+public ResponseEntity<?> Signup(UserDTO signUpRequest){
+    if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        return ResponseEntity
+                .badRequest()
+                .body("Error: Username is already taken!");
     }
 
-    public ResponseEntity<String> bookRoom(UserBookingForm form, Long id) throws NotFoundException {
-        LocalDateTime dateS = LocalDateTime.parse(form.dateStart);
-        LocalDateTime dateE = LocalDateTime.parse(form.dateEnd);
+    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        return ResponseEntity
+                .badRequest()
+                .body(" Email is already in use!");
+    }
+
+    User user=userconverter.dtoToEntity(signUpRequest);
+    user.setActive(true);
+    user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
+    user.setPassword(bCryptPasswordEncoder.encode(signUpRequest.getPassword()));
+    user = userRepository.save(user);
+    return ResponseEntity.ok().body(userconverter.entityToDto(user));
+}
+
+    public UserDTO save(UserDTO userDTO) {
+        User user = userconverter.dtoToEntity(userDTO);
+        user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user = userRepository.save(user);
+        user.setActive(true);
+        return userconverter.entityToDto(user);
+    }
+
+    public ResponseEntity<String> bookRoom(FormClass.UserBookingForm form, Long id) throws NotFoundException {
+        LocalDateTime dateS = LocalDateTime.parse(form.getDateStart());
+        LocalDateTime dateE = LocalDateTime.parse(form.getDateEnd());
         UserDTO userDTO = getById(id);
-        BookingDTO booking = bookingService.bookRoom(form.roomName, dateS, dateE);
+        BookingDTO booking = bookingService.bookRoom(form.getRoomName(), dateS, dateE);
         booking.setUser(userDTO);
-        booking.setDescription(form.description);
+        booking.setDescription(form.getDescription());
         if (dateS.isAfter(dateE) ||
                 dateE.isEqual(dateS) ||
                 dateE.isBefore(LocalDateTime.now()) ||
@@ -167,13 +191,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public UserDTO save(UserDTO userDTO) {
-        User user = userconverter.dtoToEntity(userDTO);
-        user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user = userRepository.save(user);
-        return userconverter.entityToDto(user);
-    }
+
 
     public List<UserDTO> saveUsers(List<UserDTO> userDTOS) {
         List<User> users = userconverter.dtoToEntity(userDTOS);

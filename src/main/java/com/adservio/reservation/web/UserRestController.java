@@ -5,6 +5,7 @@ import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.entities.User;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.UserService;
+import com.adservio.reservation.utilClass.FormClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -47,7 +48,7 @@ public class UserRestController {
 
 
     @PostMapping("/book/")
-    public ResponseEntity<String> BookARoom(@RequestBody UserService.UserBookingForm form) throws NotFoundException {
+    public ResponseEntity<String> BookARoom(@RequestBody FormClass.UserBookingForm form) throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
         return service.bookRoom(form, LoggedInUser.getId());
