@@ -37,6 +37,16 @@ public class RoomService {
         return converter.entityToDto(roomRepository.findAll());
     }
 
+    public List<RoomDTO> listAvailable() {
+        List<Room> rooms = roomRepository.findAll();
+        List<Room> availableRooms = new ArrayList<>();
+        for (Room room : rooms) {
+            if (!room.isReserved())
+                availableRooms.add(room);
+        }
+        return converter.entityToDto(availableRooms);
+    }
+
     public RoomDTO getById(Long id) throws NotFoundException {
 
         Optional<Room> room = roomRepository.findById(id);
@@ -74,10 +84,9 @@ public class RoomService {
         return converter.entityToDto(room);
     }
 
-    public List<RoomDTO> FindAvailable(LocalDateTime datestart, LocalDateTime dateend) {
-        if (dateend == null) {
-            dateend = datestart.plusMonths(1);
-        }
+    public List<RoomDTO> FindAvailable(String s, String e) {
+        LocalDateTime datestart = LocalDateTime.parse(s);
+        LocalDateTime dateend = LocalDateTime.parse(e);
         List<Room> availrooms = roomRepository.findMeetingRoomAvailable(datestart, dateend);
         return converter.entityToDto(availrooms);
     }
@@ -101,9 +110,7 @@ public class RoomService {
     }
 
     public RoomDTO updateRoom(Long id, RoomDTO roomDTO) {
-
         Room roomDB = roomRepository.findById(id).get();
-
         if (Objects.nonNull(roomDTO.getName()) &&
                 !"".equalsIgnoreCase(roomDTO.getName())) {
             roomDB.setName(roomDTO.getName());

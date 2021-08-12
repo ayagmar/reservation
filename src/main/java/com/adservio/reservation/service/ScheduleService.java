@@ -33,8 +33,7 @@ public class ScheduleService {
         }
 
         for (Booking activeBooking : activeBookings) {
-            System.out.println(activeBooking.getCode());
-            System.out.println(activeBooking.getEndDate());
+
             if (activeBooking.getEndDate().truncatedTo(ChronoUnit.SECONDS).isEqual(currentDate.truncatedTo(ChronoUnit.SECONDS))) {
                 String body = "your room " + activeBooking.getRoom().getName() + " is now free, booking " + activeBooking.getCode() + " has ended ";
                 String to = activeBooking.getUser().getEmail();

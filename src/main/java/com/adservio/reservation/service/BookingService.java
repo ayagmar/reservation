@@ -31,6 +31,7 @@ public class BookingService {
         return converter.entityToDto(bookingRepository.findAll());
     }
 
+
     public void DeleteByCode(String code) {
         bookingRepository.deleteByCode(code);
     }
@@ -74,7 +75,7 @@ public class BookingService {
     public BookingDTO save(BookingDTO bookingDTO) throws NotFoundException {
         Booking booking = converter.dtoToEntity(bookingDTO);
         booking.setCode(UUID.randomUUID().toString());
-        roomRepository.save(booking.getRoom());
+
         Room room = roomRepository.checkAvailability(booking.getStartDate(), booking.getEndDate(), booking.getRoom().getId());
         if (room != null) {
             booking = bookingRepository.save(booking);
@@ -84,6 +85,7 @@ public class BookingService {
         }
 
     }
+
 
     public void confirmBooking(Long id, boolean isconfirmed) throws NotFoundException {
         BookingDTO bookingDTO = getById(id);
@@ -106,4 +108,6 @@ public class BookingService {
         bookingRepository.deleteById(id);
         return "Deleted successfully";
     }
+
+
 }

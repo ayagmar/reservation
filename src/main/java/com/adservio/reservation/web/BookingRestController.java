@@ -47,8 +47,8 @@ public class BookingRestController {
         return service.save(bookingDTO);
     }
 
-    @GetMapping("/all/room/{name}")
-    public ResponseEntity<Collection<BookingDTO>> FetchBookingsByRoomName(@PathVariable String name) throws NotFoundException {
+    @GetMapping("/all/room")
+    public ResponseEntity<Collection<BookingDTO>> FetchBookingsByRoomName(@RequestBody String name) throws NotFoundException {
 
         return ResponseEntity.ok().body(service.GetAllByRoomName(name));
     }
@@ -59,8 +59,8 @@ public class BookingRestController {
         return service.saveDepartments(bookingDTOS);
     }
 
-    @PostMapping("/{id}/confirm")
-    public ResponseEntity<String> confirmBooking(@RequestParam boolean confirmed, @PathVariable Long id) throws NotFoundException {
+    @PostMapping("/confirm/{id}")
+    public ResponseEntity<String> confirmBooking(@RequestBody boolean confirmed, @PathVariable Long id) throws NotFoundException {
         service.confirmBooking(id, confirmed);
         if (confirmed)
             return ResponseEntity.ok().body("confirmed");
@@ -70,21 +70,10 @@ public class BookingRestController {
         }
     }
 
-    @DeleteMapping("/{id}/delete")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteBooking(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.deleteBooking(id));
     }
 
-}
 
-//    LocalDateTime startD=bookingDTO.getStartDate();
-//    LocalDateTime endD=bookingDTO.getEndDate();
-//    String Body="User "+bookingDTO.getUser().getFirstName()+"has reserved room "+bookingDTO.getRoom().getName().toString()+"with a duration of "
-//            + ChronoUnit.HOURS.between(startD,endD)
-//            +"From "+startD+" To "+endD;
-//        System.out.println(Body);
-//                try{
-//                emailSenderService.SendEmail(bookingDTO.getUser().getEmail(),Body,"Testing!");
-//                }catch (MailException mailException) {
-//                System.out.println(mailException);
-//                }
+}

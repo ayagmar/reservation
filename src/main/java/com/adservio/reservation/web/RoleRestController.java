@@ -49,7 +49,7 @@ public class RoleRestController {
         return "Deleted successfully";
     }
 
-    @PostMapping("/addtouser")
+    @PostMapping("/addToUser")
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
         userService.addRoleToUser(form.getUsername(), form.getRoleName());
         return ResponseEntity.ok().build();

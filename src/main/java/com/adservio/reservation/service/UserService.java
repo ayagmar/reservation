@@ -13,14 +13,7 @@ import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.UserConvert;
 import com.adservio.reservation.security.SecurityParams;
 import com.adservio.reservation.utilClass.FormClass;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,22 +23,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeTypeUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @Service
 @Transactional
@@ -79,26 +64,26 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
-public ResponseEntity<?> Signup(UserDTO signUpRequest){
-    if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-        return ResponseEntity
-                .badRequest()
-                .body("Error: Username is already taken!");
-    }
+    public ResponseEntity<?> Signup(UserDTO signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Username is already taken!");
+        }
 
-    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-        return ResponseEntity
-                .badRequest()
-                .body(" Email is already in use!");
-    }
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(" Email is already in use!");
+        }
 
-    User user=userconverter.dtoToEntity(signUpRequest);
-    user.setActive(true);
-    user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
-    user.setPassword(bCryptPasswordEncoder.encode(signUpRequest.getPassword()));
-    user = userRepository.save(user);
-    return ResponseEntity.ok().body(userconverter.entityToDto(user));
-}
+        User user = userconverter.dtoToEntity(signUpRequest);
+        user.setActive(true);
+        user.setRoles(Collections.singletonList(roleRepository.findByRoleName(SecurityParams.USER)));
+        user.setPassword(bCryptPasswordEncoder.encode(signUpRequest.getPassword()));
+        user = userRepository.save(user);
+        return ResponseEntity.ok().body(userconverter.entityToDto(user));
+    }
 
     public UserDTO save(UserDTO userDTO) {
         User user = userconverter.dtoToEntity(userDTO);
@@ -170,7 +155,11 @@ public ResponseEntity<?> Signup(UserDTO signUpRequest){
         }
 
         if (bookings.contains(booking)) {
-            bookingService.deleteBooking(booking.getId());
+
+            booking.getRoom().setReserved(false);
+            user.getBookings().remove(booking);
+            String s = bookingService.deleteBooking(booking.getId());
+            userRepository.save(user);
             List<User> users = FetchUsersByRole(SecurityParams.ADMIN);
             String Body = "User " + user.getUsername() + " has cancelled the reservation "
                     + booking.getCode() +
@@ -178,19 +167,18 @@ public ResponseEntity<?> Signup(UserDTO signUpRequest){
 
             for (User user1 : users) {
                 try {
-                    emailSenderService.SendEmail(user1.getEmail(), Body, "Testing!");
+                    emailSenderService.SendEmail(user1.getEmail(), Body, "Booking cancelled!");
                 } catch (MailException mailException) {
                     mailException.printStackTrace();
                 }
             }
 
-            return ResponseEntity.ok().body("DELETED SUCCESSFULLY");
+            return ResponseEntity.ok().body(s);
         } else {
             return ResponseEntity.status(405).body("Error deleting reservation that is not yours");
         }
 
     }
-
 
 
     public List<UserDTO> saveUsers(List<UserDTO> userDTOS) {
@@ -256,41 +244,6 @@ public ResponseEntity<?> Signup(UserDTO signUpRequest){
         }
         Collection<GrantedAuthority> authorities = user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
-    }
-
-
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String authorizationHeader = request.getHeader(SecurityParams.JWT_HEADER_NAME);
-        if (authorizationHeader != null && authorizationHeader.startsWith(SecurityParams.JWT_HEADER_PREFIX)) {
-            try {
-                String refresh_token = authorizationHeader.substring(SecurityParams.JWT_HEADER_PREFIX.length());
-                Algorithm algorithm = Algorithm.HMAC256(SecurityParams.PRIVATE_SECRET.getBytes());
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(refresh_token);
-                String username = decodedJWT.getSubject();
-                User user = GetUserByUsername(username);
-                String access_token = JWT.create()
-                        .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + SecurityParams.JWT_EXPIRATION))
-                        .withIssuer(request.getRequestURL().toString())
-                        .withClaim("roles", user.getRoles().stream().map(Role::getRoleName).collect(Collectors.toList()))
-                        .sign(algorithm);
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", access_token);
-                tokens.put("refresh_token", refresh_token);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            } catch (Exception exception) {
-                response.setHeader("error", exception.getMessage());
-                response.setStatus(FORBIDDEN.value());
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", exception.getMessage());
-                response.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
-            }
-        } else {
-            throw new RuntimeException("Refresh token is missing");
-        }
     }
 
 

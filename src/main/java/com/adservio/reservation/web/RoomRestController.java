@@ -6,14 +6,12 @@ import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,6 +28,11 @@ public class RoomRestController {
         return ResponseEntity.ok().body(service.listAll());
     }
 
+//    @GetMapping("/available")
+//    public ResponseEntity<List<RoomDTO>> findAvailableRooms() {
+//        return ResponseEntity.ok().body(service.listAvailable());
+//    }
+
     @GetMapping("/{id}")
     public ResponseEntity<RoomDTO> findRoomById(@PathVariable Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.getById(id));
@@ -40,17 +43,9 @@ public class RoomRestController {
         return ResponseEntity.ok().body(service.getRoomByName(name));
     }
 
-    //    @GetMapping("/available/{dates}/{datee}")
-//    public ResponseEntity<List<RoomDTO>> CheckAvailability(@PathVariable String dates,@PathVariable String datee) {
-//        return ResponseEntity.ok().body(service.FindAvailable(dates,datee));
-//    }
     @GetMapping("/available")
-    public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("dateStart")
-                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                               LocalDateTime dateS,
-                                                       @RequestParam("dateEnd")
-                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateE) {
-        return ResponseEntity.ok().body(service.FindAvailable(dateS, dateE));
+    public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("start") String start, @RequestParam("end") String end) {
+        return ResponseEntity.ok().body(service.FindAvailable(start, end));
     }
 
     @GetMapping("/{id}/bookings")

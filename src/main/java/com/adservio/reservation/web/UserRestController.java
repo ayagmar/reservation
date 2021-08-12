@@ -13,10 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -73,8 +70,8 @@ public class UserRestController {
         return ResponseEntity.created(uri).body(service.saveUsers(userDTOS));
     }
 
-    @DeleteMapping("/booking/cancel")
-    public ResponseEntity<String> cancelBooking(@RequestBody String Code) throws NotFoundException {
+    @DeleteMapping("/booking/cancel/{Code}")
+    public ResponseEntity<String> cancelBooking(@PathVariable String Code) throws NotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
         return service.cancelBooking(LoggedInUser.getId(), Code);
@@ -103,10 +100,10 @@ public class UserRestController {
     }
 
 
-    @GetMapping("/token/refresh")
-    public void TokenRefresh(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        service.refreshToken(request, response);
-    }
+//    @GetMapping("/token/refresh")
+//    public void TokenRefresh(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        service.refreshToken(request, response);
+//    }
 
 
 }

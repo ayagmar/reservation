@@ -40,13 +40,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // http.authorizeRequests().anyRequest().permitAll();
 
         JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(authenticationManager());
-        jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
+        jwtAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
 
         http.csrf().disable();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll();
-        http.authorizeRequests().antMatchers("/api/login/**", "/api/register").permitAll();
+        http.authorizeRequests().antMatchers("/api/auth/login/**", "/api/auth/register").permitAll();
         http.authorizeRequests().antMatchers("/api/**/save/**", "/api/**/**/update", "/api/**/**/delete", "/api/**/all").hasAuthority(SecurityParams.ADMIN);
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(jwtAuthenticationFilter);
