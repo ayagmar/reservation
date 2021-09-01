@@ -12,7 +12,7 @@ public class RoomDTO {
     private Long id;
     private String name;
     boolean reserved = false;
-    @JsonIgnore
+    int counter = 0;
     private DepartmentDTO department;
     @JsonIgnore
     private Collection<BookingDTO> bookings;

@@ -31,6 +31,7 @@ public class ReservationSystemApplication implements CommandLineRunner {
         return modelMapper;
     }
 
+
     @Bean
     BCryptPasswordEncoder getBCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();

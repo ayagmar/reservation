@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
 
-
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/department")

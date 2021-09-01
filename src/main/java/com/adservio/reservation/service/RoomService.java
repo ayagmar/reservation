@@ -1,6 +1,7 @@
 package com.adservio.reservation.service;
 
 import com.adservio.reservation.dao.BookingRepository;
+import com.adservio.reservation.dao.DepartmentRepository;
 import com.adservio.reservation.dao.RoomRepository;
 import com.adservio.reservation.dto.BookingDTO;
 import com.adservio.reservation.dto.RoomDTO;
@@ -12,6 +13,7 @@ import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.mapper.BookingConvert;
 import com.adservio.reservation.mapper.RoomConvert;
 import com.adservio.reservation.mapper.UserConvert;
+import com.adservio.reservation.utilClass.FormClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +28,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
-
+    private final DepartmentRepository departmentRepository;
     private final RoomConvert converter;
     private final BookingConvert bookingConvert;
     private final UserConvert userConvert;
@@ -36,6 +38,7 @@ public class RoomService {
 
         return converter.entityToDto(roomRepository.findAll());
     }
+
 
     public List<RoomDTO> listAvailable() {
         List<Room> rooms = roomRepository.findAll();
@@ -78,8 +81,11 @@ public class RoomService {
         return converter.entityToDto(roomRepository.findByName(name));
     }
 
-    public RoomDTO save(RoomDTO roomdto) {
-        Room room = converter.dtoToEntity(roomdto);
+    public RoomDTO save(FormClass.RoomForm form) {
+        Room room = new Room();
+        room.setReserved(false);
+        room.setName(form.getName());
+        room.setDepartment(departmentRepository.getById(form.getId()));
         room = roomRepository.save(room);
         return converter.entityToDto(room);
     }
@@ -96,6 +102,12 @@ public class RoomService {
         Room room = converter.dtoToEntity(roomDTO);
         Collection<Booking> list = room.getBookings();
         return bookingConvert.entityToDto(list);
+    }
+
+    public RoomDTO mostBookedRoom() {
+        List<RoomDTO> rooms = listAll();
+        return rooms.stream().max(Comparator.comparing(RoomDTO::getCounter)).get();
+
     }
 
 

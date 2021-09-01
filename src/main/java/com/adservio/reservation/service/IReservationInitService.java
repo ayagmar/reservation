@@ -91,6 +91,7 @@ public class IReservationInitService {
         b.setEndDate(dateE);
         b.setCode(UUID.randomUUID().toString());
         b.setConfirmed(true);
+        b.getRoom().setCounter(b.getRoom().getCounter() + 1);
         //----//
         String DateStart2 = "2021-07-30T14:00";
         String DateEnd2 = "2021-07-30T15:00";
@@ -104,6 +105,8 @@ public class IReservationInitService {
         b2.setStartDate(dateS2);
         b2.setEndDate(dateE2);
         b2.setConfirmed(true);
+        b2.getRoom().setCounter(b2.getRoom().getCounter() + 1);
+
         //----//
         String DateStart3 = "2021-07-29T10:00";
         String DateEnd3 = "2021-07-29T13:00";
@@ -116,6 +119,8 @@ public class IReservationInitService {
         b3.setStartDate(dateS3);
         b3.setEndDate(dateE3);
         b3.setConfirmed(true);
+        b3.getRoom().setCounter(b3.getRoom().getCounter() + 1);
+
 
         bookingRepository.save(b);
         bookingRepository.save(b2);

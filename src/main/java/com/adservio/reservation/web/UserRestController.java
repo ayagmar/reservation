@@ -18,10 +18,11 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
-
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
+
 public class UserRestController {
 
     private final UserService service;
@@ -76,6 +77,11 @@ public class UserRestController {
         User LoggedInUser = service.GetUserByUsername(auth.getPrincipal().toString());
         return service.cancelBooking(LoggedInUser.getId(), Code);
 
+    }
+
+    @GetMapping("/{id}/bookings")
+    public ResponseEntity<Collection<BookingDTO>> FetchBookingsByUserId(@PathVariable Long id) throws NotFoundException {
+        return ResponseEntity.ok().body(service.GetBookingsByUserId(id));
     }
 
 

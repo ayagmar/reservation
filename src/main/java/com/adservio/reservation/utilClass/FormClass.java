@@ -25,5 +25,10 @@ public class FormClass {
         String end;
     }
 
+    @Data
+    public static class RoomForm {
+        String name;
+        Long id;
+    }
 
 }

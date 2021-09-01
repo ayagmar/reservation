@@ -7,12 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 @RequiredArgsConstructor
 @Component
 public class ScheduleService {
@@ -20,9 +22,8 @@ public class ScheduleService {
     private final EmailSenderService emailSenderService;
     private final RoomRepository roomRepository;
 
-    @Scheduled(cron = "0 0/10 * * * *")
+    @Scheduled(cron = "0 0/5 * * * *")
     public void job1() throws InterruptedException {
-
         LocalDateTime currentDate = LocalDateTime.now();
         List<Booking> bookingList = bookingRepository.findAll();
         List<Booking> activeBookings = new ArrayList<>();
@@ -50,5 +51,31 @@ public class ScheduleService {
         }
         System.out.println("Ran Job at " + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
+
+    @Scheduled(cron = "0 0/5 * * * *")
+    public void job2() throws InterruptedException {
+        LocalDateTime currentDate = LocalDateTime.now();
+        List<Booking> bookingList = bookingRepository.findAll();
+        List<Booking> Bookings = new ArrayList<>();
+        for (Booking booking : bookingList) {
+            if (booking.getStartDate().plusMinutes(5).isAfter(currentDate)) {
+                Bookings.add(booking);
+                System.out.println(booking.getRoom().getName());
+            }
+        }
+
+        for (Booking activeBooking : Bookings) {
+
+            if (activeBooking.getStartDate().truncatedTo(ChronoUnit.SECONDS).isEqual(currentDate.truncatedTo(ChronoUnit.SECONDS)) && activeBooking.isConfirmed()) {
+                System.out.println(activeBooking.getRoom().getName());
+                activeBooking.getRoom().setReserved(true);
+                roomRepository.save(activeBooking.getRoom());
+            }
+
+        }
+        System.out.println("Ran Job 2 at " + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+    }
+
 
 }

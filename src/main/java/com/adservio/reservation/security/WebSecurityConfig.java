@@ -38,15 +38,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // http.authorizeRequests().anyRequest().permitAll();
-
+        http.cors().and().csrf().disable();
         JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(authenticationManager());
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
-
-        http.csrf().disable();
-
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll();
-        http.authorizeRequests().antMatchers("/api/auth/login/**", "/api/auth/register").permitAll();
+        http.authorizeRequests().antMatchers("/api/auth/login/**", "/api/auth/register", "/actuator/**").permitAll();
         http.authorizeRequests().antMatchers("/api/**/save/**", "/api/**/**/update", "/api/**/**/delete", "/api/**/all").hasAuthority(SecurityParams.ADMIN);
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(jwtAuthenticationFilter);
@@ -66,5 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected AuthenticationManager getAuthenticationManager() throws Exception {
         return super.authenticationManagerBean();
     }
+
+
 }
 

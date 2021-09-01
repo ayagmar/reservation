@@ -223,6 +223,12 @@ public class UserService implements UserDetailsService {
         return bookingConvert.entityToDto(list);
     }
 
+    public Collection<BookingDTO> GetBookingsByUserId(Long id) throws NotFoundException {
+        User user = userRepository.getById(id);
+        Collection<Booking> list = user.getBookings();
+        return bookingConvert.entityToDto(list);
+    }
+
 
     public void addRoleToUser(String username, String rolename) {
         User appUser = userRepository.findByUsername(username);

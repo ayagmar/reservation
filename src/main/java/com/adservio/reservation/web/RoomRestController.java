@@ -5,6 +5,7 @@ import com.adservio.reservation.dto.RoomDTO;
 import com.adservio.reservation.dto.UserDTO;
 import com.adservio.reservation.exception.NotFoundException;
 import com.adservio.reservation.service.RoomService;
+import com.adservio.reservation.utilClass.FormClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,11 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/room")
+
 public class RoomRestController {
 
     private final RoomService service;
@@ -26,6 +29,11 @@ public class RoomRestController {
     @GetMapping("/all")
     public ResponseEntity<List<RoomDTO>> findAllRooms() {
         return ResponseEntity.ok().body(service.listAll());
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<RoomDTO>> findAvailable() {
+        return ResponseEntity.ok().body(service.listAvailable());
     }
 
 //    @GetMapping("/available")
@@ -38,12 +46,13 @@ public class RoomRestController {
         return ResponseEntity.ok().body(service.getById(id));
     }
 
+
     @GetMapping("/findname")
     public ResponseEntity<RoomDTO> findRoomByName(@RequestParam("name") String name) throws NotFoundException {
         return ResponseEntity.ok().body(service.getRoomByName(name));
     }
 
-    @GetMapping("/available")
+    @GetMapping("/availability")
     public ResponseEntity<List<RoomDTO>> ListAvailable(@RequestParam("start") String start, @RequestParam("end") String end) {
         return ResponseEntity.ok().body(service.FindAvailable(start, end));
     }
@@ -58,6 +67,11 @@ public class RoomRestController {
         return ResponseEntity.ok().body(service.GetLastReservedRoom());
     }
 
+    @GetMapping("/mostbooked")
+    public ResponseEntity<RoomDTO> getMostBookedRoom() throws NotFoundException {
+        return ResponseEntity.ok().body(service.mostBookedRoom());
+    }
+
     @GetMapping("/{id}/users")
     public ResponseEntity<Collection<UserDTO>> GetUsersByRoom(@PathVariable("id") Long id) throws NotFoundException {
         return ResponseEntity.ok().body(service.GetUsersByRoom(id));
@@ -65,7 +79,7 @@ public class RoomRestController {
 
 
     @PostMapping("/save")
-    public ResponseEntity<RoomDTO> addRoom(@RequestBody RoomDTO roomdto) throws URISyntaxException {
+    public ResponseEntity<RoomDTO> addRoom(@RequestBody FormClass.RoomForm roomdto) throws URISyntaxException {
         RoomDTO result = service.save(roomdto);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/room/save").toUriString());
         return ResponseEntity.created(uri).body(result);

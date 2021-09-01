@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/booking")
@@ -53,6 +54,11 @@ public class BookingRestController {
         return ResponseEntity.ok().body(service.GetAllByRoomName(name));
     }
 
+
+    @GetMapping("/next")
+    public ResponseEntity<String> getNextBooking() throws NotFoundException {
+        return ResponseEntity.ok().body(service.NextBooking());
+    }
 
     @PostMapping("/save/all")
     public List<BookingDTO> addBookings(@RequestBody List<BookingDTO> bookingDTOS) {

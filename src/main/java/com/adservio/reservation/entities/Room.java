@@ -23,6 +23,7 @@ public class Room implements Serializable {
     @Column(nullable = false)
     private String name;
     boolean reserved = false;
+    int counter = 0;
     @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private Collection<Booking> bookings = new ArrayList<>();
