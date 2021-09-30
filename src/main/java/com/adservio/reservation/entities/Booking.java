@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,7 +38,7 @@ public class Booking implements Serializable {
 
 
     @JsonIgnore
-    @ManyToOne()
+    @ManyToOne
     @JoinTable(name = "users_reservations",
             joinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
