@@ -21,12 +21,10 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class BookingService {
-    public final
-    BookingRepository bookingRepository;
-    public final UserRepository userRepository;
-    public final
-    BookingConvert converter;
-    public final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final BookingConvert converter;
+    private final RoomRepository roomRepository;
 
 
     public List<BookingDTO> listAll() {
